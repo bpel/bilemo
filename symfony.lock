@@ -80,6 +80,15 @@
     "exsyst/swagger": {
         "version": "v0.4.1"
     },
+    "friendsofsymfony/rest-bundle": {
+        "version": "2.2",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "2.2",
+            "ref": "cad41ef93d6150067ae2bb3c7fd729492dff6f0a"
+        }
+    },
     "fzaninotto/faker": {
         "version": "v1.8.0"
     },
@@ -283,6 +292,12 @@
     "symfony/polyfill-php73": {
         "version": "v1.12.0"
     },
+    "symfony/process": {
+        "version": "v4.3.5"
+    },
+    "symfony/property-access": {
+        "version": "v4.3.5"
+    },
     "symfony/property-info": {
         "version": "v4.3.5"
     },
@@ -301,17 +316,57 @@
             "./config/routes.yaml"
         ]
     },
+    "symfony/security-core": {
+        "version": "v4.3.5"
+    },
+    "symfony/serializer": {
+        "version": "v4.3.5"
+    },
+    "symfony/serializer-pack": {
+        "version": "v1.0.2"
+    },
     "symfony/service-contracts": {
         "version": "v1.1.7"
     },
+    "symfony/translation-contracts": {
+        "version": "v1.1.7"
+    },
+    "symfony/validator": {
+        "version": "4.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "4.3",
+            "ref": "d902da3e4952f18d3bf05aab29512eb61cabd869"
+        },
+        "files": [
+            "./config/packages/test/validator.yaml",
+            "./config/packages/validator.yaml"
+        ]
+    },
     "symfony/var-exporter": {
         "version": "v4.3.5"
+    },
+    "symfony/web-server-bundle": {
+        "version": "3.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "3.3",
+            "ref": "dae9b39fd6717970be7601101ce5aa960bf53d9a"
+        }
     },
     "symfony/yaml": {
         "version": "v4.3.5"
     },
     "webmozart/assert": {
         "version": "1.5.0"
+    },
+    "willdurand/jsonp-callback-validator": {
+        "version": "v1.1.0"
+    },
+    "willdurand/negotiation": {
+        "version": "v2.3.1"
     },
     "zircote/swagger-php": {
         "version": "2.0.14"
