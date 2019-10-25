@@ -34,10 +34,10 @@ class Phone
     private $colour;
 
     /**
-     * @ORM\ManyToOne(targetEntity="OsPhone", cascade={"persist"})
-     * @JoinColumn(name="os", referencedColumnName="id")
+     * @ORM\ManyToOne(targetEntity="OsPhoneVersion", cascade={"persist"})
+     * @JoinColumn(name="osversion", referencedColumnName="id")
      */
-    private $os;
+    private $osVersion;
 
     /**
      * @ORM\Column(type="integer")
@@ -78,12 +78,12 @@ class Phone
         return $this;
     }
 
-    public function getGoStorage(): ?float
+    public function getGoStorage(): ?int
     {
         return $this->goStorage;
     }
 
-    public function setGoStorage(float $goStorage): self
+    public function setGoStorage(int $goStorage): self
     {
         $this->goStorage = $goStorage;
 
@@ -114,16 +114,17 @@ class Phone
         return $this;
     }
 
-    public function getOs(): ?OsPhone
+    public function getOsVersion(): ?OsPhoneVersion
     {
-        return $this->os;
+        return $this->osVersion;
     }
 
-    public function setOs(?OsPhone $os): self
+    public function setOsVersion(?OsPhoneVersion $osVersion): self
     {
-        $this->os = $os;
+        $this->osVersion = $osVersion;
 
         return $this;
     }
+
     
 }

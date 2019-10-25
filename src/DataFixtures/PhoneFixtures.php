@@ -27,7 +27,7 @@ class PhoneFixtures extends Fixture implements DependentFixtureInterface
             $phone->setColour($listColour[mt_rand('0','9')]);
             $phone->setGoStorage($faker->randomElement(array ('32','64','128','512','1000')));
             $phone->setPrice($faker->randomFloat(2,390,2300));
-            $phone->setOs($this->getReference("osphone".mt_rand('0','6')));
+            $phone->setOsVersion($this->getReference("osphoneversion".mt_rand('0','12')));
             $phone->setBrand($this->getReference("brand".mt_rand('0','10')));
             $manager->persist($phone);
             $this->addReference('phone'.$i, $phone);
@@ -39,7 +39,7 @@ class PhoneFixtures extends Fixture implements DependentFixtureInterface
     {
         return array(
             BrandFixtures::class,
-            OsPhoneFixtures::class,
+            OsPhoneVersionFixtures::class,
         );
     }
 }
