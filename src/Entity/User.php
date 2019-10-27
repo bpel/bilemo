@@ -33,6 +33,11 @@ class User
     private $email;
 
     /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $password;
+
+    /**
      * @ORM\ManyToOne(targetEntity="Enterprise", cascade={"persist"})
      * @JoinColumn(name="brand", referencedColumnName="id")
      */
@@ -79,6 +84,18 @@ class User
         return $this;
     }
 
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
     public function getEnterprise(): ?Enterprise
     {
         return $this->enterprise;
@@ -90,4 +107,5 @@ class User
 
         return $this;
     }
+
 }
