@@ -4,22 +4,25 @@ namespace App\Controller;
 
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\Annotations\View;
 
 class UserController extends AbstractController
 {
     /**
-     * @Rest\Get("/user/list")
+     * @Rest\Get("api/user/list")
      */
     public function getUsers()
     {
         $em = $this->getDoctrine()->getManager();
         $users = $em->getRepository(User::class)->findAll();
 
-        $data =  $this->get('serializer')->serialize($users, 'json');
+        if (empty($users)) {
+            return new JsonResponse(['message' => 'no users have been found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $data = $this->get('serializer')->serialize($users, 'json');
 
         $response = new Response($data);
         $response->headers->set('Content-Type', 'application/json');
@@ -28,18 +31,60 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Rest\Get("/user/detail/{id}")
+     * @Rest\Get("api/user/detail/{id}")
      */
     public function getUserDetail($id)
     {
         $em = $this->getDoctrine()->getManager();
-        $users = $em->getRepository(User::class)->findBy(['id' => $id]);
+        $user = $em->getRepository(User::class)->findUserById($id);
 
-        $data =  $this->get('serializer')->serialize($users, 'json');
+        if (empty($user)) {
+            return new JsonResponse(['message' => 'this user does not exist'], Response::HTTP_NOT_FOUND);
+        }
+
+        $data = $this->get('serializer')->serialize($user, 'json');
 
         $response = new Response($data);
         $response->headers->set('Content-Type', 'application/json');
 
         return $response;
+    }
+
+    /**
+     * @Rest\Get("api/user/enterprise/{nameEnterprise}")
+     */
+    public function getUsersByEnterprise($nameEnterprise)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $users = $em->getRepository(User::class)->findUsersByEnterprise($nameEnterprise);
+
+        if (empty($users)) {
+            return new JsonResponse(['message' => 'no users for this enterprise'], Response::HTTP_NOT_FOUND);
+        }
+
+        $data = $this->get('serializer')->serialize($users, 'json');
+
+        $response = new Response($data);
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
+    }
+
+    /**
+     * @Rest\Get("api/user/add/")
+     * @Rest\Post("api/user/add/")
+     */
+    public function addUser()
+    {
+        return new JsonResponse(['message' => 'add'], Response::HTTP_ACCEPTED);
+    }
+
+    /**
+     * @Rest\Get("api/user/delete/")
+     * @Rest\Post("api/user/delete/")
+     */
+    public function deleteUser()
+    {
+        return new JsonResponse(['message' => 'delete'], Response::HTTP_ACCEPTED);
     }
 }
