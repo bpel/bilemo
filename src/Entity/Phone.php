@@ -20,7 +20,7 @@ class Phone
     /**
      * @ORM\Column(type="string", length=200, unique=true)
      */
-    private $namephone;
+    private $namePhone;
 
     /**
      * @ORM\ManyToOne(targetEntity="Brand", cascade={"persist"})
@@ -56,12 +56,12 @@ class Phone
 
     public function getNamephone(): ?string
     {
-        return $this->namephone;
+        return $this->namePhone;
     }
 
-    public function setNamephone(string $namephone): self
+    public function setNamephone(string $namePhone): self
     {
-        $this->namephone = $namephone;
+        $this->namePhone = $namePhone;
 
         return $this;
     }

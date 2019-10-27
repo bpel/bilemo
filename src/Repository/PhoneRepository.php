@@ -19,32 +19,16 @@ class PhoneRepository extends ServiceEntityRepository
         parent::__construct($registry, Phone::class);
     }
 
-    // /**
-    //  * @return Phone[] Returns an array of Phone objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function findPhoneById($idPhone)
     {
         return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
+            ->select('p.namePhone, p.colour, p.goStorage, p.price, b.nameBrand')
+            ->leftJoin('p.brand','b')
+            ->leftJoin('p.osVersion','osv')
+            ->andWhere('p.id = :idphone')
+            ->setParameter('idphone', $idPhone)
             ->getQuery()
             ->getResult()
-        ;
+            ;
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Phone
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }
