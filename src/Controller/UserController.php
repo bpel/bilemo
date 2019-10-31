@@ -2,14 +2,19 @@
 
 namespace App\Controller;
 
+use App\Entity\Enterprise;
 use App\Entity\User;
+use App\Form\UserType;
+use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
+use Symfony\Component\Validator\Validation;
 
 class UserController extends AbstractController
 {
@@ -74,17 +79,26 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Rest\Get("api/user/add/")
      * @Rest\Post("api/user/add/")
      */
-    public function addUser()
+    public function addUser(Request $request, ObjectManager $manager)
     {
-        return new JsonResponse(['message' => 'add'], Response::HTTP_ACCEPTED);
+        $user = new User();
+
+        $form = $this->createForm(UserType::class, $user);
+
+        $form->submit($request->request->all());
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $manager->persist($user);
+            $manager->flush();
+            return new JsonResponse(['message' => 'user created'], Response::HTTP_OK);
+        }
+        return new JsonResponse(['message' => 'error'], Response::HTTP_BAD_REQUEST);
     }
 
     /**
-     * @Rest\Get("api/user/delete/")
-     * @Rest\Post("api/user/delete/")
+     * @Rest\Delete("api/user/delete/")
      */
     public function deleteUser()
     {
