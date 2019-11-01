@@ -10,8 +10,7 @@ class OsPhoneFixtures extends Fixture
 {
     public function load(ObjectManager $manager)
     {
-        $listPhoneOs = ['android', 'ios', 'windows phone','blackberry','harmony','oxygen','miui'];
-
+        $listPhoneOs = ['android', 'ios', 'windows phone', 'blackberry', 'harmony', 'miui'];
         for ($i = 0; $i < count($listPhoneOs); $i++)
         {
             $osPhone = new OsPhone();

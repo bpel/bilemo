@@ -80,6 +80,15 @@
     "exsyst/swagger": {
         "version": "v0.4.1"
     },
+    "friendsofsymfony/rest-bundle": {
+        "version": "2.2",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "2.2",
+            "ref": "cad41ef93d6150067ae2bb3c7fd729492dff6f0a"
+        }
+    },
     "fzaninotto/faker": {
         "version": "v1.8.0"
     },
@@ -140,6 +149,24 @@
             "ref": "384cec52df45f3bfd46a09930d6960a58872b268"
         }
     },
+    "lcobucci/jwt": {
+        "version": "3.3.1"
+    },
+    "lexik/jwt-authentication-bundle": {
+        "version": "2.5",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "2.5",
+            "ref": "5b2157bcd5778166a5696e42f552ad36529a07a6"
+        },
+        "files": [
+            "./config/packages/lexik_jwt_authentication.yaml"
+        ]
+    },
+    "namshi/jose": {
+        "version": "7.2.3"
+    },
     "nelmio/api-doc-bundle": {
         "version": "3.0",
         "recipe": {
@@ -169,6 +196,9 @@
     },
     "psr/log": {
         "version": "1.1.0"
+    },
+    "symfony/asset": {
+        "version": "v4.3.5"
     },
     "symfony/cache": {
         "version": "v4.3.5"
@@ -228,6 +258,9 @@
             "./.env"
         ]
     },
+    "symfony/form": {
+        "version": "v4.3.5"
+    },
     "symfony/framework-bundle": {
         "version": "4.2",
         "recipe": {
@@ -256,6 +289,9 @@
     "symfony/inflector": {
         "version": "v4.3.5"
     },
+    "symfony/intl": {
+        "version": "v4.3.5"
+    },
     "symfony/maker-bundle": {
         "version": "1.0",
         "recipe": {
@@ -271,6 +307,9 @@
     "symfony/options-resolver": {
         "version": "v4.3.5"
     },
+    "symfony/polyfill-intl-icu": {
+        "version": "v1.12.0"
+    },
     "symfony/polyfill-intl-idn": {
         "version": "v1.12.0"
     },
@@ -282,6 +321,12 @@
     },
     "symfony/polyfill-php73": {
         "version": "v1.12.0"
+    },
+    "symfony/process": {
+        "version": "v4.3.5"
+    },
+    "symfony/property-access": {
+        "version": "v4.3.5"
     },
     "symfony/property-info": {
         "version": "v4.3.5"
@@ -301,17 +346,101 @@
             "./config/routes.yaml"
         ]
     },
+    "symfony/security-bundle": {
+        "version": "3.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "3.3",
+            "ref": "e5a0228251d1dd2bca4c8ef918e14423c06db625"
+        },
+        "files": [
+            "./config/packages/security.yaml"
+        ]
+    },
+    "symfony/security-core": {
+        "version": "v4.3.5"
+    },
+    "symfony/security-csrf": {
+        "version": "v4.3.5"
+    },
+    "symfony/security-guard": {
+        "version": "v4.3.5"
+    },
+    "symfony/security-http": {
+        "version": "v4.3.5"
+    },
+    "symfony/serializer": {
+        "version": "v4.3.5"
+    },
+    "symfony/serializer-pack": {
+        "version": "v1.0.2"
+    },
     "symfony/service-contracts": {
         "version": "v1.1.7"
+    },
+    "symfony/translation-contracts": {
+        "version": "v1.1.7"
+    },
+    "symfony/twig-bridge": {
+        "version": "v4.3.5"
+    },
+    "symfony/twig-bundle": {
+        "version": "3.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "3.3",
+            "ref": "7e5911186d596214c14dd28305485a3c143ee746"
+        },
+        "files": [
+            "./config/packages/twig.yaml",
+            "./config/routes/dev/twig.yaml",
+            "./templates/base.html.twig"
+        ]
+    },
+    "symfony/validator": {
+        "version": "4.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "4.3",
+            "ref": "d902da3e4952f18d3bf05aab29512eb61cabd869"
+        },
+        "files": [
+            "./config/packages/test/validator.yaml",
+            "./config/packages/validator.yaml"
+        ]
+    },
+    "symfony/var-dumper": {
+        "version": "v4.3.5"
     },
     "symfony/var-exporter": {
         "version": "v4.3.5"
     },
+    "symfony/web-server-bundle": {
+        "version": "3.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "3.3",
+            "ref": "dae9b39fd6717970be7601101ce5aa960bf53d9a"
+        }
+    },
     "symfony/yaml": {
         "version": "v4.3.5"
     },
+    "twig/twig": {
+        "version": "v2.12.1"
+    },
     "webmozart/assert": {
         "version": "1.5.0"
+    },
+    "willdurand/jsonp-callback-validator": {
+        "version": "v1.1.0"
+    },
+    "willdurand/negotiation": {
+        "version": "v2.3.1"
     },
     "zircote/swagger-php": {
         "version": "2.0.14"
