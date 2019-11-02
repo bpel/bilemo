@@ -11,7 +11,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 class PhoneController extends AbstractController
 {
     /**
-     * @Rest\Get("api/phone/list")
+     * @Rest\Get("api/phones")
      */
     public function getPhones()
     {
@@ -31,7 +31,7 @@ class PhoneController extends AbstractController
     }
 
     /**
-     * @Rest\Get("api/phone/detail/{id}")
+     * @Rest\Get("api/phones/{id}")
      */
     public function getPhone($id)
     {

@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Validation;
 class UserController extends AbstractController
 {
     /**
-     * @Rest\Get("api/user/list")
+     * @Rest\Get("api/users")
      */
     public function getUsers()
     {
@@ -39,7 +39,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Rest\Get("api/user/detail/{id}")
+     * @Rest\Get("api/users/{id}")
      */
     public function getUserDetail($id)
     {
@@ -59,7 +59,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Rest\Get("api/user/enterprise/{nameEnterprise}")
+     * @Rest\Get("api/users/enterprise/{nameEnterprise}")
      */
     public function getUsersByEnterprise($nameEnterprise)
     {
@@ -79,7 +79,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Rest\Post("api/user/add/")
+     * @Rest\Post("api/users/")
      */
     public function addUser(Request $request, ObjectManager $manager)
     {
@@ -98,7 +98,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Rest\Delete("api/user/delete/")
+     * @Rest\Delete("api/users/")
      */
     public function deleteUser()
     {
