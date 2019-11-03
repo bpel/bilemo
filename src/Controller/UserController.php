@@ -15,6 +15,7 @@ use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
 use Symfony\Component\Validator\Validation;
+use Hateoas\HateoasBuilder;
 
 class UserController extends AbstractController
 {
@@ -30,7 +31,9 @@ class UserController extends AbstractController
             return new JsonResponse(['message' => 'no users have been found'], Response::HTTP_NOT_FOUND);
         }
 
-        $data = $this->get('serializer')->serialize($users, 'json');
+        $hateoas = HateoasBuilder::create()->build();
+
+        $data = $hateoas->serialize($users, 'json');
 
         $response = new Response($data);
         $response->headers->set('Content-Type', 'application/json');
@@ -50,7 +53,9 @@ class UserController extends AbstractController
             return new JsonResponse(['message' => 'this user does not exist'], Response::HTTP_NOT_FOUND);
         }
 
-        $data = $this->get('serializer')->serialize($user, 'json');
+        $hateoas = HateoasBuilder::create()->build();
+
+        $data = $hateoas->serialize($user, 'json');
 
         $response = new Response($data);
         $response->headers->set('Content-Type', 'application/json');
@@ -59,18 +64,20 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Rest\Get("api/users/enterprise/{nameEnterprise}")
+     * @Rest\Get("api/users/enterprise/{id}")
      */
-    public function getUsersByEnterprise($nameEnterprise)
+    public function getUsersByEnterprise($id)
     {
         $em = $this->getDoctrine()->getManager();
-        $users = $em->getRepository(User::class)->findUsersByEnterprise($nameEnterprise);
+        $users = $em->getRepository(User::class)->findUsersByEnterprise($id);
 
         if (empty($users)) {
             return new JsonResponse(['message' => 'no users for this enterprise'], Response::HTTP_NOT_FOUND);
         }
 
-        $data = $this->get('serializer')->serialize($users, 'json');
+        $hateoas = HateoasBuilder::create()->build();
+
+        $data = $hateoas->serialize($users, 'json');
 
         $response = new Response($data);
         $response->headers->set('Content-Type', 'application/json');
@@ -79,7 +86,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Rest\Post("api/users/")
+     * @Rest\Post("api/users")
      */
     public function addUser(Request $request, ObjectManager $manager)
     {
@@ -92,13 +99,13 @@ class UserController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $manager->persist($user);
             $manager->flush();
-            return new JsonResponse(['message' => 'user created'], Response::HTTP_OK);
+            return new JsonResponse(['message' => 'user was successfully created'], Response::HTTP_OK);
         }
-        return new JsonResponse(['message' => 'error'], Response::HTTP_BAD_REQUEST);
+        return new JsonResponse(['message' => 'One or multiple fields are not valid.'], Response::HTTP_BAD_REQUEST);
     }
 
     /**
-     * @Rest\Delete("api/users/")
+     * @Rest\Delete("api/users")
      */
     public function deleteUser()
     {

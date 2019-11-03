@@ -6,10 +6,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+use Hateoas\Configuration\Annotation as Hateoas;
+use JMS\Serializer\Annotation\Exclude as Exclude;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @UniqueEntity("email")
+ * @Hateoas\Relation("self", href = "expr('/api/users/' ~ object.getId())")
  */
 class User
 {
@@ -42,12 +45,13 @@ class User
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank
+     * @Exclude
      */
     private $password;
 
     /**
      * @ORM\ManyToOne(targetEntity="Enterprise", cascade={"persist"})
-     * @JoinColumn(name="brand", referencedColumnName="id")
+     * @JoinColumn(name="enterprise", referencedColumnName="id")
      * @Assert\NotBlank
      */
     private $enterprise;
