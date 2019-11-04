@@ -105,10 +105,20 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Rest\Delete("api/users")
+     * @Rest\Delete("api/users/{id}")
      */
-    public function deleteUser()
+    public function deleteUser($id)
     {
-        return new JsonResponse(['message' => 'delete'], Response::HTTP_ACCEPTED);
+        $em = $this->getDoctrine()->getManager();
+        $user = $em->getRepository(User::class)->findOneBy(['id' => $id]);
+
+        if (empty($user)) {
+            return new JsonResponse(['message' => 'this user does not exist'], Response::HTTP_NOT_FOUND);
+        }
+
+        $em->remove($user);
+        $em->flush();
+
+        return new JsonResponse(['message' => 'user was successfully deleted'], Response::HTTP_OK);
     }
 }
