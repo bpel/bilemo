@@ -14,6 +14,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Validator\Validation;
 use Hateoas\HateoasBuilder;
 
@@ -88,7 +89,7 @@ class UserController extends AbstractController
     /**
      * @Rest\Post("api/users")
      */
-    public function addUser(Request $request, ObjectManager $manager)
+    public function addUser(Request $request, ObjectManager $manager, UserPasswordEncoderInterface $encoder)
     {
         $user = new User();
 
@@ -97,6 +98,11 @@ class UserController extends AbstractController
         $form->submit($request->request->all());
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $plainPassword = $user->getPassword();
+            $encoded = $encoder->encodePassword($user, $plainPassword);
+            $user->setPassword($encoded);
+
             $manager->persist($user);
             $manager->flush();
             return new JsonResponse(['message' => 'user was successfully created'], Response::HTTP_OK);
