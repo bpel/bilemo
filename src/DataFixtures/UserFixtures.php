@@ -38,6 +38,21 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
             $this->addReference('user'.$i, $user);
             $manager->flush($user);
         }
+
+        $user = new User();
+
+        $user->setFirstname('demo');
+        $user->setLastname('test');
+        $user->setEmail('demo@test.fr');
+
+        $encoded = $this->encoder->encodePassword($user, 'demo');
+        $user->setPassword($encoded);
+
+        $user->setEnterprise($this->getReference("enterprise".mt_rand('0','14')));
+
+        $manager->persist($user);
+        $manager->flush();
+
     }
 
     public function getDependencies()
