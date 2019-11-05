@@ -10,10 +10,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Validator\Validation;
 use Hateoas\HateoasBuilder;
@@ -21,7 +21,23 @@ use Hateoas\HateoasBuilder;
 class UserController extends AbstractController
 {
     /**
-     * @Rest\Get("api/users")
+     * @Route("/api/users", methods={"GET"})
+     * @return Response
+     *
+     * @SWG\Get(
+     * summary="Get user list",
+     * description="",
+     * produces={"application/json"},
+     * @SWG\Response(
+     *     response=200,
+     *     description="Return user list",
+     *     @SWG\Schema(
+     *         type="array",
+     *         @SWG\Items(ref=@Model(type=User::class, groups={"full"}))
+     *     )
+     *   )
+     * )
+     * @SWG\Tag(name="User")
      */
     public function getUsers()
     {
@@ -29,7 +45,7 @@ class UserController extends AbstractController
         $users = $em->getRepository(User::class)->findAll();
 
         if (empty($users)) {
-            return new JsonResponse(['message' => 'no users have been found'], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['status' => '404', 'message' => 'no users have been found'], Response::HTTP_NOT_FOUND);
         }
 
         $hateoas = HateoasBuilder::create()->build();
@@ -43,7 +59,24 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Rest\Get("api/users/{id}")
+     * @Route("/api/users/{id}", methods={"GET"})
+     * @param $id
+     * @return Response
+     *
+     * @SWG\Get(
+     * summary="Get user detail",
+     * description="",
+     * produces={"application/json"},
+     * @SWG\Response(
+     *     response=200,
+     *     description="Return user detail",
+     *     @SWG\Schema(
+     *         type="array",
+     *         @SWG\Items(ref=@Model(type=User::class, groups={"full"}))
+     *     )
+     *   )
+     * )
+     * @SWG\Tag(name="User")
      */
     public function getUserDetail($id)
     {
@@ -65,7 +98,24 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Rest\Get("api/users/enterprise/{id}")
+     * @Route("/api/users/enterprise/{id}", methods={"GET"})
+     * @param $id
+     * @return Response
+     *
+     * @SWG\Get(
+     * summary="",
+     * description="blaldfdd",
+     * produces={"application/json"},
+     * @SWG\Response(
+     *     response=200,
+     *     description="Return list user per enterprise",
+     *     @SWG\Schema(
+     *         type="array",
+     *         @SWG\Items(ref=@Model(type=User::class, groups={"full"}))
+     *     )
+     *   )
+     * )
+     * @SWG\Tag(name="User")
      */
     public function getUsersByEnterprise($id)
     {
@@ -87,7 +137,19 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Rest\Post("api/users")
+     * @Route("/api/users", methods={"POST"})
+     * @return Response
+     *
+     * @SWG\Post(
+     * summary="Create new user",
+     * description="",
+     * produces={"application/json"},
+     * @SWG\Response(
+     *     response=200,
+     *     description="User created",
+     *   )
+     * )
+     * @SWG\Tag(name="User")
      */
     public function addUser(Request $request, ObjectManager $manager, UserPasswordEncoderInterface $encoder)
     {
@@ -111,7 +173,19 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Rest\Delete("api/users/{id}")
+     * @Route("/api/users", methods={"DELETE"})
+     * @return Response
+     *
+     * @SWG\Delete(
+     * summary="Delete user",
+     * description="",
+     * produces={"application/json"},
+     * @SWG\Response(
+     *     response=200,
+     *     description="User deleted",
+     *   )
+     * )
+     * @SWG\Tag(name="User")
      */
     public function deleteUser($id)
     {
@@ -126,5 +200,14 @@ class UserController extends AbstractController
         $em->flush();
 
         return new JsonResponse(['message' => 'user was successfully deleted'], Response::HTTP_OK);
+    }
+
+    /**
+     * @Route("/api/login_check", methods={"POST"})
+     * @return Response
+     */
+    public function login()
+    {
+        return new JsonResponse(['user' => $this->getUser()], Response::HTTP_NOT_FOUND);
     }
 }

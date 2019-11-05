@@ -3,15 +3,33 @@
 namespace App\Controller;
 
 use App\Entity\Phone;
+use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use FOS\RestBundle\Controller\Annotations as Rest;
+use Swagger\Annotations as SWG;
+use Symfony\Component\Routing\Annotation\Route;
 
 class PhoneController extends AbstractController
 {
     /**
-     * @Rest\Get("api/phones")
+     * @Route("/api/phones", methods={"GET"})
+     * @return Response
+     *
+     * @SWG\Get(
+     * summary="Get phone list",
+     * description="",
+     * produces={"application/json"},
+     * @SWG\Response(
+     *     response=200,
+     *     description="Return phone list",
+     *     @SWG\Schema(
+     *         type="array",
+     *         @SWG\Items(ref=@Model(type=Phone::class, groups={"full"}))
+     *     )
+     *   )
+     * )
+     * @SWG\Tag(name="Phone")
      */
     public function getPhones()
     {
@@ -31,7 +49,24 @@ class PhoneController extends AbstractController
     }
 
     /**
-     * @Rest\Get("api/phones/{id}")
+     * @Route("/api/phones/{id}", methods={"GET"})
+     * @param $id
+     * @return Response
+     *
+     * @SWG\Get(
+     * summary="Get phone detail",
+     * description="",
+     * produces={"application/json"},
+     * @SWG\Response(
+     *     response=200,
+     *     description="Return phone detail",
+     *     @SWG\Schema(
+     *         type="array",
+     *         @SWG\Items(ref=@Model(type=Phone::class, groups={"full"}))
+     *     )
+     *   )
+     * )
+     * @SWG\Tag(name="Phone")
      */
     public function getPhone($id)
     {
