@@ -45,7 +45,7 @@ class UserController extends AbstractController
         $users = $em->getRepository(User::class)->findAll();
 
         if (empty($users)) {
-            return new JsonResponse(['status' => '404', 'message' => 'no users have been found'], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['code' => 404, 'message' => 'User not found'], Response::HTTP_NOT_FOUND);
         }
 
         $hateoas = HateoasBuilder::create()->build();
@@ -84,7 +84,7 @@ class UserController extends AbstractController
         $user = $em->getRepository(User::class)->findUserById($id);
 
         if (empty($user)) {
-            return new JsonResponse(['message' => 'this user does not exist'], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['code' => 404, 'message' => 'User not found for id = '.$id], Response::HTTP_NOT_FOUND);
         }
 
         $hateoas = HateoasBuilder::create()->build();
@@ -123,7 +123,7 @@ class UserController extends AbstractController
         $users = $em->getRepository(User::class)->findUsersByEnterprise($id);
 
         if (empty($users)) {
-            return new JsonResponse(['message' => 'no users for this enterprise'], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['code' => 404, 'message' => 'Users not found for enterprise with id = '.$id], Response::HTTP_NOT_FOUND);
         }
 
         $hateoas = HateoasBuilder::create()->build();
@@ -167,9 +167,9 @@ class UserController extends AbstractController
 
             $manager->persist($user);
             $manager->flush();
-            return new JsonResponse(['message' => 'user was successfully created'], Response::HTTP_OK);
+            return new JsonResponse(['code' => 201, 'message' => 'User created'], Response::HTTP_OK);
         }
-        return new JsonResponse(['message' => 'One or multiple fields are not valid.'], Response::HTTP_BAD_REQUEST);
+        return new JsonResponse(['code' => 400, 'message' => 'Fields are not valid.'], Response::HTTP_BAD_REQUEST);
     }
 
     /**
@@ -193,13 +193,13 @@ class UserController extends AbstractController
         $user = $em->getRepository(User::class)->findOneBy(['id' => $id]);
 
         if (empty($user)) {
-            return new JsonResponse(['message' => 'this user does not exist'], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['code' => 404, 'message' => 'User not found'], Response::HTTP_NOT_FOUND);
         }
 
         $em->remove($user);
         $em->flush();
 
-        return new JsonResponse(['message' => 'user was successfully deleted'], Response::HTTP_OK);
+        return new JsonResponse(['code' => 201, 'message' => 'User deleted'], Response::HTTP_OK);
     }
 
     /**
@@ -208,6 +208,6 @@ class UserController extends AbstractController
      */
     public function login()
     {
-        return new JsonResponse(['user' => $this->getUser()], Response::HTTP_NOT_FOUND);
+        return new JsonResponse(['user' => $this->getUser()]);
     }
 }

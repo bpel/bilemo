@@ -37,7 +37,7 @@ class PhoneController extends AbstractController
         $phones = $em->getRepository(Phone::class)->findAll();
 
         if (empty($phones)) {
-            return new JsonResponse(['message' => 'no phone have been found'], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['code' => 404, 'message' => 'Phone not found'], Response::HTTP_NOT_FOUND);
         }
 
         $data = $this->get('serializer')->serialize($phones, 'json');
@@ -74,7 +74,7 @@ class PhoneController extends AbstractController
         $phone = $em->getRepository(Phone::class)->findPhoneById($id);
 
         if (empty($phone)) {
-            return new JsonResponse(['message' => 'this phone does not exist'], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['code' => 404, 'message' => 'Phone not found for id = '.$id], Response::HTTP_NOT_FOUND);
         }
 
         $data = $this->get('serializer')->serialize($phone, 'json');
