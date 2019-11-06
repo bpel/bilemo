@@ -17,6 +17,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Validator\Validation;
 use Hateoas\HateoasBuilder;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class UserController extends AbstractController
 {
@@ -38,11 +40,15 @@ class UserController extends AbstractController
      *   )
      * )
      * @SWG\Tag(name="User")
+     * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getUsers()
+    public function getUsers(CacheInterface $cache)
     {
-        $em = $this->getDoctrine()->getManager();
-        $users = $em->getRepository(User::class)->findAll();
+        $users = $cache->get('users-list', function (ItemInterface $item){
+            $item->expiresAfter(120);
+            $em = $this->getDoctrine()->getManager();
+            return $em->getRepository(User::class)->findAll();
+        });
 
         if (empty($users)) {
             return new JsonResponse(['code' => 404, 'message' => 'User not found'], Response::HTTP_NOT_FOUND);
@@ -77,11 +83,16 @@ class UserController extends AbstractController
      *   )
      * )
      * @SWG\Tag(name="User")
+     * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getUserDetail($id)
+    public function getUserDetail($id, CacheInterface $cache)
     {
-        $em = $this->getDoctrine()->getManager();
-        $user = $em->getRepository(User::class)->findUserById($id);
+        $user = $cache->get('user-detail', function (ItemInterface $item) use ($id) {
+            $item->expiresAfter(120);
+            $em = $this->getDoctrine()->getManager();
+
+            return $em->getRepository(User::class)->findUserById($id);
+        });
 
         if (empty($user)) {
             return new JsonResponse(['code' => 404, 'message' => 'User not found for id = '.$id], Response::HTTP_NOT_FOUND);
@@ -116,11 +127,15 @@ class UserController extends AbstractController
      *   )
      * )
      * @SWG\Tag(name="User")
+     * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getUsersByEnterprise($id)
+    public function getUsersByEnterprise($id, CacheInterface $cache)
     {
-        $em = $this->getDoctrine()->getManager();
-        $users = $em->getRepository(User::class)->findUsersByEnterprise($id);
+        $users = $cache->get('user-detail', function (ItemInterface $item) use ($id){
+            $item->expiresAfter(120);
+            $em = $this->getDoctrine()->getManager();
+            return $em->getRepository(User::class)->findUsersByEnterprise($id);
+        });
 
         if (empty($users)) {
             return new JsonResponse(['code' => 404, 'message' => 'Users not found for enterprise with id = '.$id], Response::HTTP_NOT_FOUND);
@@ -173,7 +188,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/api/users", methods={"DELETE"})
+     * @Route("/api/users/{id}", methods={"DELETE"})
      * @return Response
      *
      * @SWG\Delete(

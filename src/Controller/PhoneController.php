@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Swagger\Annotations as SWG;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class PhoneController extends AbstractController
 {
@@ -30,11 +32,15 @@ class PhoneController extends AbstractController
      *   )
      * )
      * @SWG\Tag(name="Phone")
+     * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getPhones()
+    public function getPhones(CacheInterface $cache)
     {
-        $em = $this->getDoctrine()->getManager();
-        $phones = $em->getRepository(Phone::class)->findAll();
+        $phones = $cache->get('phones-list', function (ItemInterface $item){
+            $item->expiresAfter(120);
+            $em = $this->getDoctrine()->getManager();
+            return $em->getRepository(Phone::class)->findAll();
+        });
 
         if (empty($phones)) {
             return new JsonResponse(['code' => 404, 'message' => 'Phone not found'], Response::HTTP_NOT_FOUND);
@@ -67,11 +73,15 @@ class PhoneController extends AbstractController
      *   )
      * )
      * @SWG\Tag(name="Phone")
+     * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getPhone($id)
+    public function getPhone($id, CacheInterface $cache)
     {
-        $em = $this->getDoctrine()->getManager();
-        $phone = $em->getRepository(Phone::class)->findPhoneById($id);
+        $phone = $cache->get('phone-detail', function (ItemInterface $item) use ($id){
+            $item->expiresAfter(120);
+            $em = $this->getDoctrine()->getManager();
+            return $em->getRepository(Phone::class)->findPhoneById($id);
+        });
 
         if (empty($phone)) {
             return new JsonResponse(['code' => 404, 'message' => 'Phone not found for id = '.$id], Response::HTTP_NOT_FOUND);
