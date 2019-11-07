@@ -3,9 +3,11 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\BrandRepository")
+ * @Hateoas\Relation("self", href = "expr('/api/brands/' ~ object.getId())")
  */
 class Brand
 {

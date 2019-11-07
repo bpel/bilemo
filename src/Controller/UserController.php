@@ -10,27 +10,53 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Validator\Validation;
+use Hateoas\HateoasBuilder;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class UserController extends AbstractController
 {
     /**
-     * @Rest\Get("api/user/list")
+     * @Route("/api/users", methods={"GET"})
+     * @return Response
+     *
+     * @SWG\Get(
+     * summary="Get user list",
+     * description="",
+     * produces={"application/json"},
+     * @SWG\Response(
+     *     response=200,
+     *     description="Return user list",
+     *     @SWG\Schema(
+     *         type="array",
+     *         @SWG\Items(ref=@Model(type=User::class, groups={"full"}))
+     *     )
+     *   )
+     * )
+     * @SWG\Tag(name="User")
+     * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getUsers()
+    public function getUsers(CacheInterface $cache)
     {
-        $em = $this->getDoctrine()->getManager();
-        $users = $em->getRepository(User::class)->findAll();
+        $users = $cache->get('users-list', function (ItemInterface $item){
+            $item->expiresAfter(120);
+            $em = $this->getDoctrine()->getManager();
+            return $em->getRepository(User::class)->findAll();
+        });
 
         if (empty($users)) {
-            return new JsonResponse(['message' => 'no users have been found'], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['code' => 404, 'message' => 'User not found'], Response::HTTP_NOT_FOUND);
         }
 
-        $data = $this->get('serializer')->serialize($users, 'json');
+        $hateoas = HateoasBuilder::create()->build();
+
+        $data = $hateoas->serialize($users, 'json');
 
         $response = new Response($data);
         $response->headers->set('Content-Type', 'application/json');
@@ -39,18 +65,42 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Rest\Get("api/user/detail/{id}")
+     * @Route("/api/users/{id}", methods={"GET"})
+     * @param $id
+     * @return Response
+     *
+     * @SWG\Get(
+     * summary="Get user detail",
+     * description="",
+     * produces={"application/json"},
+     * @SWG\Response(
+     *     response=200,
+     *     description="Return user detail",
+     *     @SWG\Schema(
+     *         type="array",
+     *         @SWG\Items(ref=@Model(type=User::class, groups={"full"}))
+     *     )
+     *   )
+     * )
+     * @SWG\Tag(name="User")
+     * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getUserDetail($id)
+    public function getUserDetail($id, CacheInterface $cache)
     {
-        $em = $this->getDoctrine()->getManager();
-        $user = $em->getRepository(User::class)->findUserById($id);
+        $user = $cache->get('user-detail-'.$id, function (ItemInterface $item) use ($id) {
+            $item->expiresAfter(120);
+            $em = $this->getDoctrine()->getManager();
+
+            return $em->getRepository(User::class)->findUserById($id);
+        });
 
         if (empty($user)) {
-            return new JsonResponse(['message' => 'this user does not exist'], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['code' => 404, 'message' => 'User not found for id = '.$id], Response::HTTP_NOT_FOUND);
         }
 
-        $data = $this->get('serializer')->serialize($user, 'json');
+        $hateoas = HateoasBuilder::create()->build();
+
+        $data = $hateoas->serialize($user, 'json');
 
         $response = new Response($data);
         $response->headers->set('Content-Type', 'application/json');
@@ -59,18 +109,41 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Rest\Get("api/user/enterprise/{nameEnterprise}")
+     * @Route("/api/users/enterprise/{id}", methods={"GET"})
+     * @param $id
+     * @return Response
+     *
+     * @SWG\Get(
+     * summary="",
+     * description="blaldfdd",
+     * produces={"application/json"},
+     * @SWG\Response(
+     *     response=200,
+     *     description="Return list user per enterprise",
+     *     @SWG\Schema(
+     *         type="array",
+     *         @SWG\Items(ref=@Model(type=User::class, groups={"full"}))
+     *     )
+     *   )
+     * )
+     * @SWG\Tag(name="User")
+     * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getUsersByEnterprise($nameEnterprise)
+    public function getUsersByEnterprise($id, CacheInterface $cache)
     {
-        $em = $this->getDoctrine()->getManager();
-        $users = $em->getRepository(User::class)->findUsersByEnterprise($nameEnterprise);
+        $users = $cache->get('user-detail-'.$id, function (ItemInterface $item) use ($id){
+            $item->expiresAfter(120);
+            $em = $this->getDoctrine()->getManager();
+            return $em->getRepository(User::class)->findUsersByEnterprise($id);
+        });
 
         if (empty($users)) {
-            return new JsonResponse(['message' => 'no users for this enterprise'], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['code' => 404, 'message' => 'Users not found for enterprise with id = '.$id], Response::HTTP_NOT_FOUND);
         }
 
-        $data = $this->get('serializer')->serialize($users, 'json');
+        $hateoas = HateoasBuilder::create()->build();
+
+        $data = $hateoas->serialize($users, 'json');
 
         $response = new Response($data);
         $response->headers->set('Content-Type', 'application/json');
@@ -79,9 +152,21 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Rest\Post("api/user/add/")
+     * @Route("/api/users", methods={"POST"})
+     * @return Response
+     *
+     * @SWG\Post(
+     * summary="Create new user",
+     * description="",
+     * produces={"application/json"},
+     * @SWG\Response(
+     *     response=200,
+     *     description="User created",
+     *   )
+     * )
+     * @SWG\Tag(name="User")
      */
-    public function addUser(Request $request, ObjectManager $manager)
+    public function addUser(Request $request, ObjectManager $manager, UserPasswordEncoderInterface $encoder)
     {
         $user = new User();
 
@@ -90,18 +175,54 @@ class UserController extends AbstractController
         $form->submit($request->request->all());
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $plainPassword = $user->getPassword();
+            $encoded = $encoder->encodePassword($user, $plainPassword);
+            $user->setPassword($encoded);
+
             $manager->persist($user);
             $manager->flush();
-            return new JsonResponse(['message' => 'user created'], Response::HTTP_OK);
+            return new JsonResponse(['code' => 201, 'message' => 'User created'], Response::HTTP_OK);
         }
-        return new JsonResponse(['message' => 'error'], Response::HTTP_BAD_REQUEST);
+        return new JsonResponse(['code' => 400, 'message' => 'Fields are not valid.'], Response::HTTP_BAD_REQUEST);
     }
 
     /**
-     * @Rest\Delete("api/user/delete/")
+     * @Route("/api/users/{id}", methods={"DELETE"})
+     * @return Response
+     *
+     * @SWG\Delete(
+     * summary="Delete user",
+     * description="",
+     * produces={"application/json"},
+     * @SWG\Response(
+     *     response=200,
+     *     description="User deleted",
+     *   )
+     * )
+     * @SWG\Tag(name="User")
      */
-    public function deleteUser()
+    public function deleteUser($id)
     {
-        return new JsonResponse(['message' => 'delete'], Response::HTTP_ACCEPTED);
+        $em = $this->getDoctrine()->getManager();
+        $user = $em->getRepository(User::class)->findOneBy(['id' => $id]);
+
+        if (empty($user)) {
+            return new JsonResponse(['code' => 404, 'message' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $em->remove($user);
+        $em->flush();
+
+        return new JsonResponse(['code' => 204, 'message' => 'User deleted'], Response::HTTP_OK);
+    }
+
+    /**
+     * @Route("/api/login_check", methods={"POST"})
+     * @return Response
+     */
+    public function login()
+    {
+        return new JsonResponse(['user' => $this->getUser()]);
     }
 }

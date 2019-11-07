@@ -21,7 +21,7 @@ class UserType extends AbstractType
             ->add('password')
             ->add('enterprise', EntityType::class, [
                 'class' => Enterprise::class,
-                'choice_value' => 'nameenterprise',
+                'choice_value' => 'id',
             ])
         ;
     }

@@ -1,6 +1,6 @@
 nelmio_api_doc:
   documentation:
-    host: http://localhost/api
+    host: localhost:8000
     schemes: [http]
     info:
       title: BileMo
