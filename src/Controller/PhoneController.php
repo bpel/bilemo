@@ -77,7 +77,7 @@ class PhoneController extends AbstractController
      */
     public function getPhone($id, CacheInterface $cache)
     {
-        $phone = $cache->get('phone-detail', function (ItemInterface $item) use ($id){
+        $phone = $cache->get('phone-detail-'.$id, function (ItemInterface $item) use ($id){
             $item->expiresAfter(120);
             $em = $this->getDoctrine()->getManager();
             return $em->getRepository(Phone::class)->findPhoneById($id);

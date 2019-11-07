@@ -87,7 +87,7 @@ class UserController extends AbstractController
      */
     public function getUserDetail($id, CacheInterface $cache)
     {
-        $user = $cache->get('user-detail', function (ItemInterface $item) use ($id) {
+        $user = $cache->get('user-detail-'.$id, function (ItemInterface $item) use ($id) {
             $item->expiresAfter(120);
             $em = $this->getDoctrine()->getManager();
 
@@ -131,7 +131,7 @@ class UserController extends AbstractController
      */
     public function getUsersByEnterprise($id, CacheInterface $cache)
     {
-        $users = $cache->get('user-detail', function (ItemInterface $item) use ($id){
+        $users = $cache->get('user-detail-'.$id, function (ItemInterface $item) use ($id){
             $item->expiresAfter(120);
             $em = $this->getDoctrine()->getManager();
             return $em->getRepository(User::class)->findUsersByEnterprise($id);
