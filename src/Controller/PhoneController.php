@@ -38,7 +38,7 @@ class PhoneController extends AbstractController
     public function getPhones(PhoneRepository $phoneRepository, CacheInterface $cache)
     {
         $phones = $cache->get('phones-list', function (ItemInterface $item) use($phoneRepository) {
-            $item->expiresAfter(120);
+            $item->expiresAfter($this->getParameter("cache.expiration"));
 
             return $phoneRepository->findAll();
         });
@@ -79,7 +79,7 @@ class PhoneController extends AbstractController
     public function getPhone(PhoneRepository $phoneRepository, CacheInterface $cache, $id)
     {
         $phone = $cache->get('phone-detail-'.$id, function (ItemInterface $item) use ($phoneRepository, $id){
-            $item->expiresAfter(120);
+            $item->expiresAfter($this->getParameter("cache.expiration"));
 
             return $phoneRepository->findPhoneById($id);
         });

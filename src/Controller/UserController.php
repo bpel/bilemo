@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Enterprise;
 use App\Entity\User;
+use App\Form\UserType;
 use App\Repository\UserRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -48,7 +49,7 @@ class UserController extends AbstractController
         $limit = $request->query->get('limit');
 
         $users = $cache->get('users-list-p'.$page.'-l'.$limit, function (ItemInterface $item) use ($userRepository, $page, $limit){
-            $item->expiresAfter(120);
+            $item->expiresAfter($this->getParameter("cache.expiration"));
             return $userRepository->findAllUsers($page, $limit);
         });
 
@@ -90,7 +91,7 @@ class UserController extends AbstractController
     public function getUserDetail(UserRepository $userRepository, $id, CacheInterface $cache)
     {
         $user = $cache->get('user-detail-'.$id, function (ItemInterface $item) use ($id, $userRepository) {
-            $item->expiresAfter(120);
+            $item->expiresAfter($this->getParameter("cache.expiration"));
 
             return $userRepository->findUserById($id);
         });
@@ -133,7 +134,7 @@ class UserController extends AbstractController
     public function getUsersByEnterprise(UserRepository $userRepository, $id, CacheInterface $cache)
     {
         $users = $cache->get('user-detail-'.$id, function (ItemInterface $item) use ($userRepository, $id){
-            $item->expiresAfter(120);
+            $item->expiresAfter($this->getParameter("cache.expiration"));
 
             return $userRepository->findUsersByEnterprise($id);
         });
