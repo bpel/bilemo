@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Enterprise;
 use App\Entity\User;
-use App\Form\UserType;
+use App\Repository\UserRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -42,12 +42,14 @@ class UserController extends AbstractController
      * @SWG\Tag(name="User")
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getUsers(CacheInterface $cache)
+    public function getUsers(Request $request, UserRepository $userRepository, CacheInterface $cache)
     {
-        $users = $cache->get('users-list', function (ItemInterface $item){
+        $page = $request->query->get('page');
+        $limit = $request->query->get('limit');
+
+        $users = $cache->get('users-list-p'.$page.'-l'.$limit, function (ItemInterface $item) use ($userRepository, $page, $limit){
             $item->expiresAfter(120);
-            $em = $this->getDoctrine()->getManager();
-            return $em->getRepository(User::class)->findAll();
+            return $userRepository->findAllUsers($page, $limit);
         });
 
         if (empty($users)) {
@@ -85,13 +87,12 @@ class UserController extends AbstractController
      * @SWG\Tag(name="User")
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getUserDetail($id, CacheInterface $cache)
+    public function getUserDetail(UserRepository $userRepository, $id, CacheInterface $cache)
     {
-        $user = $cache->get('user-detail-'.$id, function (ItemInterface $item) use ($id) {
+        $user = $cache->get('user-detail-'.$id, function (ItemInterface $item) use ($id, $userRepository) {
             $item->expiresAfter(120);
-            $em = $this->getDoctrine()->getManager();
 
-            return $em->getRepository(User::class)->findUserById($id);
+            return $userRepository->findUserById($id);
         });
 
         if (empty($user)) {
@@ -109,7 +110,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/api/users/enterprise/{id}", methods={"GET"})
+     * @Route("/api/enterprise/{id}/users", methods={"GET"})
      * @param $id
      * @return Response
      *
@@ -129,12 +130,12 @@ class UserController extends AbstractController
      * @SWG\Tag(name="User")
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getUsersByEnterprise($id, CacheInterface $cache)
+    public function getUsersByEnterprise(UserRepository $userRepository, $id, CacheInterface $cache)
     {
-        $users = $cache->get('user-detail-'.$id, function (ItemInterface $item) use ($id){
+        $users = $cache->get('user-detail-'.$id, function (ItemInterface $item) use ($userRepository, $id){
             $item->expiresAfter(120);
-            $em = $this->getDoctrine()->getManager();
-            return $em->getRepository(User::class)->findUsersByEnterprise($id);
+
+            return $userRepository->findUsersByEnterprise($id);
         });
 
         if (empty($users)) {

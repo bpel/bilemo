@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Phone;
+use App\Repository\PhoneRepository;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -34,12 +35,12 @@ class PhoneController extends AbstractController
      * @SWG\Tag(name="Phone")
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getPhones(CacheInterface $cache)
+    public function getPhones(PhoneRepository $phoneRepository, CacheInterface $cache)
     {
-        $phones = $cache->get('phones-list', function (ItemInterface $item){
+        $phones = $cache->get('phones-list', function (ItemInterface $item) use($phoneRepository) {
             $item->expiresAfter(120);
-            $em = $this->getDoctrine()->getManager();
-            return $em->getRepository(Phone::class)->findAll();
+
+            return $phoneRepository->findAll();
         });
 
         if (empty($phones)) {
@@ -75,12 +76,12 @@ class PhoneController extends AbstractController
      * @SWG\Tag(name="Phone")
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getPhone($id, CacheInterface $cache)
+    public function getPhone(PhoneRepository $phoneRepository, CacheInterface $cache, $id)
     {
-        $phone = $cache->get('phone-detail-'.$id, function (ItemInterface $item) use ($id){
+        $phone = $cache->get('phone-detail-'.$id, function (ItemInterface $item) use ($phoneRepository, $id){
             $item->expiresAfter(120);
-            $em = $this->getDoctrine()->getManager();
-            return $em->getRepository(Phone::class)->findPhoneById($id);
+
+            return $phoneRepository->findPhoneById($id);
         });
 
         if (empty($phone)) {

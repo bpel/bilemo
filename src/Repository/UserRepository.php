@@ -42,4 +42,14 @@ class UserRepository extends ServiceEntityRepository
             ->getResult()
             ;
     }
+
+    public function findAllUsers($page, $limit)
+    {
+        return $this->createQueryBuilder('u')
+            ->getQuery()
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getResult()
+            ;
+    }
 }
