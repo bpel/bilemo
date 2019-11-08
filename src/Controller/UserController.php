@@ -215,7 +215,7 @@ class UserController extends AbstractController
         $em->remove($user);
         $em->flush();
 
-        return new JsonResponse(['code' => 201, 'message' => 'User deleted'], Response::HTTP_OK);
+        return new JsonResponse(['code' => 204, 'message' => 'User deleted'], Response::HTTP_OK);
     }
 
     /**
