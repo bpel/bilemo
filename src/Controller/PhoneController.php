@@ -7,6 +7,7 @@ use App\Repository\PhoneRepository;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Swagger\Annotations as SWG;
 use Symfony\Component\Routing\Annotation\Route;
@@ -35,12 +36,15 @@ class PhoneController extends AbstractController
      * @SWG\Tag(name="Phone")
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getPhones(PhoneRepository $phoneRepository, CacheInterface $cache)
+    public function getPhones(Request $request, PhoneRepository $phoneRepository, CacheInterface $cache)
     {
-        $phones = $cache->get('phones-list', function (ItemInterface $item) use($phoneRepository) {
+        $page = $request->query->get('page');
+        $limit = $request->query->get('limit');
+
+        $phones = $cache->get('phones-list', function (ItemInterface $item) use($phoneRepository, $page, $limit) {
             $item->expiresAfter($this->getParameter("cache.expiration"));
 
-            return $phoneRepository->findAll();
+            return $phoneRepository->findAllPhones($page, $limit);
         });
 
         if (empty($phones)) {

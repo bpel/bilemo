@@ -31,4 +31,14 @@ class PhoneRepository extends ServiceEntityRepository
             ->getResult()
             ;
     }
+
+    public function findAllPhones($page, $limit)
+    {
+        return $this->createQueryBuilder('p')
+            ->getQuery()
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getResult()
+            ;
+    }
 }
