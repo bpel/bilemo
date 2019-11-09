@@ -93,7 +93,7 @@ class UserController extends AbstractController
         $user = $cache->get('user-detail-'.$id, function (ItemInterface $item) use ($id, $userRepository) {
             $item->expiresAfter($this->getParameter("cache.expiration"));
 
-            return $userRepository->findUserById($id);
+            return $userRepository->findOneBy(['id' => $id]);
         });
 
         if (empty($user)) {
@@ -103,49 +103,6 @@ class UserController extends AbstractController
         $hateoas = HateoasBuilder::create()->build();
 
         $data = $hateoas->serialize($user, 'json');
-
-        $response = new Response($data);
-        $response->headers->set('Content-Type', 'application/json');
-
-        return $response;
-    }
-
-    /**
-     * @Route("/api/enterprise/{id}/users", methods={"GET"})
-     * @param $id
-     * @return Response
-     *
-     * @SWG\Get(
-     * summary="",
-     * description="blaldfdd",
-     * produces={"application/json"},
-     * @SWG\Response(
-     *     response=200,
-     *     description="Return list user per enterprise",
-     *     @SWG\Schema(
-     *         type="array",
-     *         @SWG\Items(ref=@Model(type=User::class, groups={"full"}))
-     *     )
-     *   )
-     * )
-     * @SWG\Tag(name="User")
-     * @throws \Psr\Cache\InvalidArgumentException
-     */
-    public function getUsersByEnterprise(UserRepository $userRepository, $id, CacheInterface $cache)
-    {
-        $users = $cache->get('user-detail-'.$id, function (ItemInterface $item) use ($userRepository, $id){
-            $item->expiresAfter($this->getParameter("cache.expiration"));
-
-            return $userRepository->findUsersByEnterprise($id);
-        });
-
-        if (empty($users)) {
-            return new JsonResponse(['code' => 404, 'message' => 'Users not found for enterprise with id = '.$id], Response::HTTP_NOT_FOUND);
-        }
-
-        $hateoas = HateoasBuilder::create()->build();
-
-        $data = $hateoas->serialize($users, 'json');
 
         $response = new Response($data);
         $response->headers->set('Content-Type', 'application/json');
@@ -217,14 +174,5 @@ class UserController extends AbstractController
         $em->flush();
 
         return new JsonResponse(['code' => 204, 'message' => 'User deleted'], Response::HTTP_OK);
-    }
-
-    /**
-     * @Route("/api/login_check", methods={"POST"})
-     * @return Response
-     */
-    public function login()
-    {
-        return new JsonResponse(['user' => $this->getUser()]);
     }
 }

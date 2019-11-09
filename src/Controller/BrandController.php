@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Phone;
-use App\Repository\PhoneRepository;
+use App\Entity\Brand;
+use App\Repository\BrandRepository;
 use Hateoas\HateoasBuilder;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,90 +15,89 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
-class PhoneController extends AbstractController
+class BrandController extends AbstractController
 {
     /**
-     * @Route("/api/phones", methods={"GET"})
+     * @Route("/api/brands", methods={"GET"})
      * @return Response
      *
      * @SWG\Get(
-     * summary="Get phone list",
+     * summary="Get brand list",
      * description="",
      * produces={"application/json"},
      * @SWG\Response(
      *     response=200,
-     *     description="Return phone list",
+     *     description="Return brand list",
      *     @SWG\Schema(
      *         type="array",
-     *         @SWG\Items(ref=@Model(type=Phone::class, groups={"full"}))
+     *         @SWG\Items(ref=@Model(type=Brand::class, groups={"full"}))
      *     )
      *   )
      * )
-     * @SWG\Tag(name="Phone")
+     * @SWG\Tag(name="Brand")
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getPhones(Request $request, PhoneRepository $phoneRepository, CacheInterface $cache)
+    public function getBrands(Request $request, BrandRepository $brandRepository, CacheInterface $cache)
     {
         $page = $request->query->get('page');
         $limit = $request->query->get('limit');
 
-        $phones = $cache->get('phones-list', function (ItemInterface $item) use($phoneRepository, $page, $limit) {
+        $brands = $cache->get('brands-list', function (ItemInterface $item) use($brandRepository, $page, $limit) {
             $item->expiresAfter($this->getParameter("cache.expiration"));
 
-            return $phoneRepository->findAllPhones($page, $limit);
+            return $brandRepository->findAllBrands($page, $limit);
         });
 
-        if (empty($phones)) {
-            return new JsonResponse(['code' => 404, 'message' => 'Phone not found'], Response::HTTP_NOT_FOUND);
+        if (empty($brands)) {
+            return new JsonResponse(['code' => 404, 'message' => 'Brand not found'], Response::HTTP_NOT_FOUND);
         }
 
         $hateoas = HateoasBuilder::create()->build();
 
-        $data = $hateoas->serialize($phones, 'json');
+        $data = $hateoas->serialize($brands, 'json');
 
         $response = new Response($data);
-
         $response->headers->set('Content-Type', 'application/json');
 
         return $response;
     }
 
     /**
-     * @Route("/api/phones/{id}", methods={"GET"})
+     * @Route("/api/brands/{id}", methods={"GET"})
      * @param $id
      * @return Response
      *
      * @SWG\Get(
-     * summary="Get phone detail",
+     * summary="Get brand detail",
      * description="",
      * produces={"application/json"},
      * @SWG\Response(
      *     response=200,
-     *     description="Return phone detail",
+     *     description="Return brand detail",
      *     @SWG\Schema(
      *         type="array",
-     *         @SWG\Items(ref=@Model(type=Phone::class, groups={"full"}))
+     *         @SWG\Items(ref=@Model(type=Brand::class, groups={"full"}))
      *     )
      *   )
      * )
-     * @SWG\Tag(name="Phone")
+     * @SWG\Tag(name="Brand")
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getPhone(PhoneRepository $phoneRepository, CacheInterface $cache, $id)
+    public function getBrand(BrandRepository $brandRepository, CacheInterface $cache, $id)
     {
-        $phone = $cache->get('phone-detail-'.$id, function (ItemInterface $item) use ($phoneRepository, $id){
+        $brand = $cache->get('brand-detail-'.$id, function (ItemInterface $item) use ($brandRepository, $id){
             $item->expiresAfter($this->getParameter("cache.expiration"));
 
-            return $phoneRepository->findOneBy(['id' => $id]);
+            return $brandRepository->findOneBy(['id' => $id]);
         });
 
-        if (empty($phone)) {
-            return new JsonResponse(['code' => 404, 'message' => 'Phone not found for id = '.$id], Response::HTTP_NOT_FOUND);
+        if (empty($brand)) {
+            return new JsonResponse(['code' => 404, 'message' => 'Brand not found for id = '.$id], Response::HTTP_NOT_FOUND);
         }
 
         $hateoas = HateoasBuilder::create()->build();
 
-        $data = $hateoas->serialize($phone, 'json');
+        $data = $hateoas->serialize($brand, 'json');
 
         $response = new Response($data);
         $response->headers->set('Content-Type', 'application/json');
