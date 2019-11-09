@@ -19,32 +19,13 @@ class EnterpriseRepository extends ServiceEntityRepository
         parent::__construct($registry, Enterprise::class);
     }
 
-    // /**
-    //  * @return Enterprise[] Returns an array of Enterprise objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function findAllEnterprises($page, $limit)
     {
         return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('e.id', 'ASC')
-            ->setMaxResults(10)
             ->getQuery()
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
             ->getResult()
-        ;
+            ;
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Enterprise
-    {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

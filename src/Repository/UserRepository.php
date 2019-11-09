@@ -31,18 +31,6 @@ class UserRepository extends ServiceEntityRepository
         ;
     }
 
-    public function findUserById($idUser)
-    {
-        return $this->createQueryBuilder('u')
-            ->select()
-            ->leftJoin('u.enterprise','e')
-            ->andWhere('u.id = :iduser')
-            ->setParameter('iduser', $idUser)
-            ->getQuery()
-            ->getResult()
-            ;
-    }
-
     public function findAllUsers($page, $limit)
     {
         return $this->createQueryBuilder('u')

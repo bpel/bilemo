@@ -19,32 +19,13 @@ class OsPhoneVersionRepository extends ServiceEntityRepository
         parent::__construct($registry, OsPhoneVersion::class);
     }
 
-    // /**
-    //  * @return OsPhoneVersion[] Returns an array of OsPhoneVersion objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function findAllOsVersion($page, $limit)
     {
-        return $this->createQueryBuilder('o')
-            ->andWhere('o.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('o.id', 'ASC')
-            ->setMaxResults(10)
+        return $this->createQueryBuilder('osv')
             ->getQuery()
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
             ->getResult()
-        ;
+            ;
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?OsPhoneVersion
-    {
-        return $this->createQueryBuilder('o')
-            ->andWhere('o.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }
