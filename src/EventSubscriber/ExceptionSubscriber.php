@@ -4,17 +4,30 @@ namespace App\EventSubscriber;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ExceptionSubscriber implements EventSubscriberInterface
 {
     public function onKernelException(ExceptionEvent $event)
     {
         $exception = $event->getException();
-        $data = [
-            'code' => $exception->getStatusCode(),
-            'message' => 'Resource not found'
-        ];
+        $data = [];
+
+        if($exception instanceof \Exception){
+            $data = [
+                'code' => 500,
+                'message' => 'Internal Server Error'
+            ];
+        }
+
+        if($exception instanceof NotFoundHttpException ){
+            $data = [
+                'code' => $exception->getStatusCode(),
+                'message' => 'Resource not found'
+            ];
+        }
 
         $response = new JsonResponse($data);
         $event->setResponse($response);
