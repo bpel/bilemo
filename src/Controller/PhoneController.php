@@ -34,6 +34,20 @@ class PhoneController extends AbstractController
      *     )
      *   )
      * )
+     *
+     * @SWG\Parameter(
+     *     name="page",
+     *     in="query",
+     *     type="integer",
+     *     description="Number page"
+     * )
+     * @SWG\Parameter(
+     *     name="limit",
+     *     in="query",
+     *     type="integer",
+     *     description="Number of element per page"
+     * )
+     *
      * @SWG\Tag(name="Phone")
      * @throws \Psr\Cache\InvalidArgumentException
      */
