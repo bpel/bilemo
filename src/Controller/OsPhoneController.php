@@ -42,7 +42,7 @@ class OsPhoneController extends AbstractController
         $page = $request->query->get('page');
         $limit = $request->query->get('limit');
 
-        $osPhones = $cache->get('phones-list', function (ItemInterface $item) use($osPhoneRepository, $page, $limit) {
+        $osPhones = $cache->get('osphones-list-p'.$page.'-l'.$limit, function (ItemInterface $item) use($osPhoneRepository, $page, $limit) {
             $item->expiresAfter($this->getParameter("cache.expiration"));
 
             return $osPhoneRepository->findAllOsPhones($page, $limit);
@@ -86,7 +86,7 @@ class OsPhoneController extends AbstractController
      */
     public function getPhone(OsPhoneRepository $osPhoneRepository, CacheInterface $cache, $id)
     {
-        $osPhone = $cache->get('phone-detail-'.$id, function (ItemInterface $item) use ($osPhoneRepository, $id){
+        $osPhone = $cache->get('osphones-detail-'.$id, function (ItemInterface $item) use ($osPhoneRepository, $id){
             $item->expiresAfter($this->getParameter("cache.expiration"));
 
             return $osPhoneRepository->findOneBy(['id' => $id]);

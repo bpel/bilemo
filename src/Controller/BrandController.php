@@ -42,7 +42,7 @@ class BrandController extends AbstractController
         $page = $request->query->get('page');
         $limit = $request->query->get('limit');
 
-        $brands = $cache->get('brands-list', function (ItemInterface $item) use($brandRepository, $page, $limit) {
+        $brands = $cache->get('brands-list-p'.$page.'-l'.$limit, function (ItemInterface $item) use($brandRepository, $page, $limit) {
             $item->expiresAfter($this->getParameter("cache.expiration"));
 
             return $brandRepository->findAllBrands($page, $limit);

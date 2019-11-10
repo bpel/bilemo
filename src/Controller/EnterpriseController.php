@@ -43,7 +43,7 @@ class EnterpriseController extends AbstractController
         $page = $request->query->get('page');
         $limit = $request->query->get('limit');
 
-        $enterprises = $cache->get('brands-list', function (ItemInterface $item) use($enterpriseRepository, $page, $limit) {
+        $enterprises = $cache->get('enterprise-list-p'.$page.'-l'.$limit, function (ItemInterface $item) use($enterpriseRepository, $page, $limit) {
             $item->expiresAfter($this->getParameter("cache.expiration"));
 
             return $enterpriseRepository->findAllEnterprises($page, $limit);
@@ -86,7 +86,7 @@ class EnterpriseController extends AbstractController
      */
     public function getBrand(EnterpriseRepository $enterpriseRepository, CacheInterface $cache, $id)
     {
-        $enterprise = $cache->get('brand-detail-'.$id, function (ItemInterface $item) use ($enterpriseRepository, $id){
+        $enterprise = $cache->get('enterprise-detail-'.$id, function (ItemInterface $item) use ($enterpriseRepository, $id){
             $item->expiresAfter($this->getParameter("cache.expiration"));
 
             return $enterpriseRepository->findOneBy(['id' => $id]);
@@ -127,12 +127,15 @@ class EnterpriseController extends AbstractController
      * @SWG\Tag(name="Enterprise")
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getUsersByEnterprise(UserRepository $userRepository, $id, CacheInterface $cache)
+    public function getUsersByEnterprise(Request $request, UserRepository $userRepository, $id, CacheInterface $cache)
     {
-        $users = $cache->get('user-detail-'.$id, function (ItemInterface $item) use ($userRepository, $id){
+        $page = $request->query->get('page');
+        $limit = $request->query->get('limit');
+
+        $users = $cache->get('enterprise-users-id'.$id.'-p'.$page.'-l'.$limit, function (ItemInterface $item) use ($userRepository, $id, $page, $limit){
             $item->expiresAfter($this->getParameter("cache.expiration"));
 
-            return $userRepository->findUsersByEnterprise($id);
+            return $userRepository->findUsersByEnterprise($id, $page, $limit);
         });
 
         if (empty($users)) {

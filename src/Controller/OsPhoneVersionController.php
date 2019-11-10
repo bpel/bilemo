@@ -42,7 +42,7 @@ class OsPhoneVersionController extends AbstractController
         $page = $request->query->get('page');
         $limit = $request->query->get('limit');
 
-        $osPhones = $cache->get('phones-list', function (ItemInterface $item) use($osPhoneVersionRepository, $page, $limit) {
+        $osPhones = $cache->get('osphonesversions-list-p'.$page.'-l'.$limit, function (ItemInterface $item) use($osPhoneVersionRepository, $page, $limit) {
             $item->expiresAfter($this->getParameter("cache.expiration"));
 
             return $osPhoneVersionRepository->findAllOsVersion($page, $limit);
@@ -86,7 +86,7 @@ class OsPhoneVersionController extends AbstractController
      */
     public function getPhone(OsPhoneVersionRepository $osPhoneVersionRepository, CacheInterface $cache, $id)
     {
-        $osPhoneVersion = $cache->get('phone-detail-'.$id, function (ItemInterface $item) use ($osPhoneVersionRepository, $id){
+        $osPhoneVersion = $cache->get('osphoneversion-detail-'.$id, function (ItemInterface $item) use ($osPhoneVersionRepository, $id){
             $item->expiresAfter($this->getParameter("cache.expiration"));
 
             return $osPhoneVersionRepository->findOneBy(['id' => $id]);

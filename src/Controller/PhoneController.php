@@ -42,7 +42,7 @@ class PhoneController extends AbstractController
         $page = $request->query->get('page');
         $limit = $request->query->get('limit');
 
-        $phones = $cache->get('phones-list', function (ItemInterface $item) use($phoneRepository, $page, $limit) {
+        $phones = $cache->get('phones-list-p'.$page.'-l'.$limit, function (ItemInterface $item) use($phoneRepository, $page, $limit) {
             $item->expiresAfter($this->getParameter("cache.expiration"));
 
             return $phoneRepository->findAllPhones($page, $limit);
