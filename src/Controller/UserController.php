@@ -157,6 +157,7 @@ class UserController extends AbstractController
             $manager->flush();
             return new JsonResponse(['code' => 201, 'message' => 'User created'], Response::HTTP_OK);
         }
+
         return new JsonResponse(['code' => 400, 'message' => 'Fields are not valid.'], Response::HTTP_BAD_REQUEST);
     }
 
@@ -174,8 +175,9 @@ class UserController extends AbstractController
      *   )
      * )
      * @SWG\Tag(name="User")
+     * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function deleteUser($id)
+    public function deleteUser($id, CacheInterface $cache)
     {
         $em = $this->getDoctrine()->getManager();
         $user = $em->getRepository(User::class)->findOneBy(['id' => $id]);
@@ -187,6 +189,8 @@ class UserController extends AbstractController
         $em->remove($user);
         $em->flush();
 
-        return new JsonResponse(['code' => 204, 'message' => 'User deleted'], Response::HTTP_OK);
+        $cache->delete('user-detail-'.$id);
+
+        return new JsonResponse(['code' => 204, 'message' => 'User deleted'], Response::HTTP_NO_CONTENT);
     }
 }
