@@ -14,6 +14,8 @@ Twig >= 1.5
 Composer >= 1.9
 ```
 
+## Install
+
 ### Download or clone the repository
 
 
@@ -21,7 +23,7 @@ Composer >= 1.9
 Git clone https://github.com/bpel/bilemo.git
 ```
 
-## Download dependencies
+### Download dependencies
 
 ```
 // from /bilemo/
@@ -29,7 +31,7 @@ composer install
 ```
 
 
-## Config
+### Config
 
  `.env`
 
@@ -50,19 +52,28 @@ composer install
   ```
   
 ### Generate the SSH keys:
-   
+`from /bilemo/config/jwt`
 ```
-// from /bilemo/config/jwt (needed to create the directory jwtss)
+// (need to create the directory jwt)
+// don't forget your passphrase for the next step
 
 openssl genpkey -out config/jwt/private.pem -aes256 -algorithm rsa -pkeyopt rsa_keygen_bits:4096
 openssl pkey -in config/jwt/private.pem -out config/jwt/public.pem -pubout
 ```
+`from /bilemo/config/packages/lexik_jwt_authentication.yaml`
+```
+//define "CUSTOM_PASS_PHRASE"
+lexik_jwt_authentication:
+    secret_key: '%kernel.project_dir%/config/jwt/private.pem'
+    public_key: '%kernel.project_dir%/config/jwt/public.pem'
+    pass_phrase: CUSTOM_PASS_PHRASE
+    token_ttl: 3600
+```
 
 ### Create database
 
+`from /bilemo/`
 ```
-// from /bilemo/
-
 // 1) create database (need .env config)
 php bin/console doctrine:database:create
 
@@ -75,28 +86,22 @@ php bin/console doctrine:migrations:migrate
 // 3) Load fixtures
 php bin/console doctrines:fixtures:load
 ```
-## Deployment
+### Deployment
 
 ```
 php bin/console server:run
 ```
 
-### Default user
-
-email | password
-| ----- | --------
-demo@test.fr | demo
-
-## Use API
+## Authentification
 
 ```
-// Doc of Api available on localhost:8000/api/doc
-
-// Auth
-POST localhost:8000/api/login_check
-
-// Body params
-{"username":"demo@test.fr","password":"demo"}
-
 curl -X POST -H "Content-Type: application/json" http://127.0.0.1:8000/api/login_check -d '{"username":"demo@test.fr","password":"demo"}'
 ```
+
+## Constraints
+
+- User must be linked to an enterprise
+
+## Documentation
+
+- Documentation is available on `127.0.0.1:8000/api/doc`
