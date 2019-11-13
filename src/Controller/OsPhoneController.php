@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\OsPhone;
 use App\Repository\OsPhoneRepository;
+use App\Service\Pagination;
 use Hateoas\HateoasBuilder;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -51,10 +52,15 @@ class OsPhoneController extends AbstractController
      * @SWG\Tag(name="Os")
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getPhones(Request $request, OsPhoneRepository $osPhoneRepository, CacheInterface $cache)
+    public function getPhones(Request $request, OsPhoneRepository $osPhoneRepository, CacheInterface $cache, Pagination $pagination)
     {
         $page = $request->query->get('page');
         $limit = $request->query->get('limit');
+
+        if(!$pagination->isValidParameters($page, $limit))
+        {
+            return new JsonResponse(['code' => 400, 'message' => 'Bad parameters for pagination'], Response::HTTP_BAD_REQUEST);
+        }
 
         $osPhones = $cache->get('osphones-list-p'.$page.'-l'.$limit, function (ItemInterface $item) use($osPhoneRepository, $page, $limit) {
             $item->expiresAfter($this->getParameter("cache.expiration"));

@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Enterprise;
 use App\Repository\EnterpriseRepository;
 use App\Repository\UserRepository;
+use App\Service\Pagination;
 use Hateoas\HateoasBuilder;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -52,10 +53,15 @@ class EnterpriseController extends AbstractController
      * @SWG\Tag(name="Enterprise")
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getBrands(Request $request, EnterpriseRepository $enterpriseRepository, CacheInterface $cache)
+    public function getBrands(Request $request, EnterpriseRepository $enterpriseRepository, CacheInterface $cache, Pagination $pagination)
     {
         $page = $request->query->get('page');
         $limit = $request->query->get('limit');
+
+        if(!$pagination->isValidParameters($page, $limit))
+        {
+            return new JsonResponse(['code' => 400, 'message' => 'Bad parameters for pagination'], Response::HTTP_BAD_REQUEST);
+        }
 
         $enterprises = $cache->get('enterprise-list-p'.$page.'-l'.$limit, function (ItemInterface $item) use($enterpriseRepository, $page, $limit) {
             $item->expiresAfter($this->getParameter("cache.expiration"));

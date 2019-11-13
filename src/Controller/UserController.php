@@ -6,6 +6,7 @@ use App\Entity\Enterprise;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
+use App\Service\Pagination;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -57,10 +58,15 @@ class UserController extends AbstractController
      * @SWG\Tag(name="User")
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getUsers(Request $request, UserRepository $userRepository, CacheInterface $cache)
+    public function getUsers(Request $request, UserRepository $userRepository, CacheInterface $cache, Pagination $pagination)
     {
         $page = $request->query->get('page');
         $limit = $request->query->get('limit');
+
+        if(!$pagination->isValidParameters($page, $limit))
+        {
+            return new JsonResponse(['code' => 400, 'message' => 'Bad parameters for pagination'], Response::HTTP_BAD_REQUEST);
+        }
 
         $users = $cache->get('users-list-p'.$page.'-l'.$limit, function (ItemInterface $item) use ($userRepository, $page, $limit){
             $item->expiresAfter($this->getParameter("cache.expiration"));

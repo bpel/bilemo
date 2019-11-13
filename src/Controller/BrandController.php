@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Brand;
 use App\Repository\BrandRepository;
+use App\Service\Pagination;
 use Hateoas\HateoasBuilder;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -51,10 +52,15 @@ class BrandController extends AbstractController
      * @SWG\Tag(name="Brand")
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getBrands(Request $request, BrandRepository $brandRepository, CacheInterface $cache)
+    public function getBrands(Request $request, BrandRepository $brandRepository, CacheInterface $cache, Pagination $pagination)
     {
         $page = $request->query->get('page');
         $limit = $request->query->get('limit');
+
+        if(!$pagination->isValidParameters($page, $limit))
+        {
+            return new JsonResponse(['code' => 400, 'message' => 'Bad parameters for pagination'], Response::HTTP_BAD_REQUEST);
+        }
 
         $brands = $cache->get('brands-list-p'.$page.'-l'.$limit, function (ItemInterface $item) use($brandRepository, $page, $limit) {
             $item->expiresAfter($this->getParameter("cache.expiration"));
