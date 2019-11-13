@@ -36,21 +36,42 @@ composer install
    ```
    // dev or prod
    APP_ENV=prod
+   
    // define db_user & db_password
    DATABASE_URL=mysql://db_user:db_password@127.0.0.1:3306/bilemo
    ```
+   
+ `config/services.yaml`
+ 
+  ```
+  // define the time of cache in seconds
+  parameters:
+      cache.expiration: 120
+  ```
+  
+### Generate the SSH keys:
+   
+```
+// from /bilemo/config/jwt (needed to create the directory jwtss)
+
+openssl genpkey -out config/jwt/private.pem -aes256 -algorithm rsa -pkeyopt rsa_keygen_bits:4096
+openssl pkey -in config/jwt/private.pem -out config/jwt/public.pem -pubout
+```
 
 ### Create database
 
 ```
 // from /bilemo/
+
 // 1) create database (need .env config)
 php bin/console doctrine:database:create
+
 // 2) Load schema
 php bin/console doctrine:schema:update --force
 OR
 php bin/console make:migration
 php bin/console doctrine:migrations:migrate
+
 // 3) Load fixtures
 php bin/console doctrines:fixtures:load
 ```
@@ -65,3 +86,17 @@ php bin/console server:run
 email | password
 | ----- | --------
 demo@test.fr | demo
+
+## Use API
+
+```
+// Doc of Api available on localhost:8000/api/doc
+
+// Auth
+POST localhost:8000/api/login_check
+
+// Body params
+{"username":"demo@test.fr","password":"demo"}
+
+curl -X POST -H "Content-Type: application/json" http://127.0.0.1:8000/api/login_check -d '{"username":"demo@test.fr","password":"demo"}'
+```
