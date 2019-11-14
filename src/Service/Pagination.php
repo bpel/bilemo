@@ -19,7 +19,7 @@ class Pagination {
 
     public function isDefined($page, $limit): bool
     {
-        if($page ==! null || $limit ==! null) { return true; }
+        if(isset($page) || isset($limit)) { return true; }
         return false;
     }
 
