@@ -19,32 +19,13 @@ class OsPhoneRepository extends ServiceEntityRepository
         parent::__construct($registry, OsPhone::class);
     }
 
-    // /**
-    //  * @return OsPhone[] Returns an array of OsPhone objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function findAllOsPhones($page, $limit)
     {
-        return $this->createQueryBuilder('o')
-            ->andWhere('o.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('o.id', 'ASC')
-            ->setMaxResults(10)
+        return $this->createQueryBuilder('op')
             ->getQuery()
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
             ->getResult()
-        ;
+            ;
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?OsPhone
-    {
-        return $this->createQueryBuilder('o')
-            ->andWhere('o.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

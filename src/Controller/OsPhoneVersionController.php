@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Phone;
-use App\Repository\PhoneRepository;
+use App\Entity\OsPhoneVersion;
+use App\Repository\OsPhoneVersionRepository;
 use App\Service\Pagination;
 use Hateoas\HateoasBuilder;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -16,22 +16,22 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
-class PhoneController extends AbstractController
+class OsPhoneVersionController extends AbstractController
 {
     /**
-     * @Route("/api/phones", methods={"GET"})
+     * @Route("/api/osversions", methods={"GET"})
      * @return Response
      *
      * @SWG\Get(
-     * summary="Get phone list",
+     * summary="Get Os version list",
      * description="",
      * produces={"application/json"},
      * @SWG\Response(
      *     response=200,
-     *     description="Return phone list",
+     *     description="Return os version list",
      *     @SWG\Schema(
      *         type="array",
-     *         @SWG\Items(ref=@Model(type=Phone::class, groups={"full"}))
+     *         @SWG\Items(ref=@Model(type=OsPhoneVersion::class, groups={"full"}))
      *     )
      *   )
      * )
@@ -49,10 +49,10 @@ class PhoneController extends AbstractController
      *     description="Number of element per page"
      * )
      *
-     * @SWG\Tag(name="Phone")
+     * @SWG\Tag(name="Os version")
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getPhones(Request $request, PhoneRepository $phoneRepository, CacheInterface $cache, Pagination $pagination)
+    public function getPhones(Request $request, OsPhoneVersionRepository $osPhoneVersionRepository, CacheInterface $cache, Pagination $pagination)
     {
         $page = $request->query->get('page');
         $limit = $request->query->get('limit');
@@ -62,19 +62,19 @@ class PhoneController extends AbstractController
             return new JsonResponse(['code' => 400, 'message' => 'Bad parameters for pagination'], Response::HTTP_BAD_REQUEST);
         }
 
-        $phones = $cache->get('phones-list-p'.$page.'-l'.$limit, function (ItemInterface $item) use($phoneRepository, $page, $limit) {
+        $osPhones = $cache->get('osphonesversions-list-p'.$page.'-l'.$limit, function (ItemInterface $item) use($osPhoneVersionRepository, $page, $limit) {
             $item->expiresAfter($this->getParameter("cache.expiration"));
 
-            return $phoneRepository->findAllPhones($page, $limit);
+            return $osPhoneVersionRepository->findAllOsVersion($page, $limit);
         });
 
-        if (empty($phones)) {
-            return new JsonResponse(['code' => 404, 'message' => 'Phone not found'], Response::HTTP_NOT_FOUND);
+        if (empty($osPhones)) {
+            return new JsonResponse(['code' => 404, 'message' => 'Os version not found'], Response::HTTP_NOT_FOUND);
         }
 
         $hateoas = HateoasBuilder::create()->build();
 
-        $data = $hateoas->serialize($phones, 'json');
+        $data = $hateoas->serialize($osPhones, 'json');
 
         $response = new Response($data);
 
@@ -84,41 +84,41 @@ class PhoneController extends AbstractController
     }
 
     /**
-     * @Route("/api/phones/{id}", methods={"GET"})
+     * @Route("/api/osversions/{id}", methods={"GET"})
      * @param $id
      * @return Response
      *
      * @SWG\Get(
-     * summary="Get phone detail",
+     * summary="Get Os version detail",
      * description="",
      * produces={"application/json"},
      * @SWG\Response(
      *     response=200,
-     *     description="Return phone detail",
+     *     description="Return os version detail",
      *     @SWG\Schema(
      *         type="array",
-     *         @SWG\Items(ref=@Model(type=Phone::class, groups={"full"}))
+     *         @SWG\Items(ref=@Model(type=OsPhoneVersion::class, groups={"full"}))
      *     )
      *   )
      * )
-     * @SWG\Tag(name="Phone")
+     * @SWG\Tag(name="Os version")
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getPhone(PhoneRepository $phoneRepository, CacheInterface $cache, $id)
+    public function getPhone(OsPhoneVersionRepository $osPhoneVersionRepository, CacheInterface $cache, $id)
     {
-        $phone = $cache->get('phone-detail-'.$id, function (ItemInterface $item) use ($phoneRepository, $id){
+        $osPhoneVersion = $cache->get('osphoneversion-detail-'.$id, function (ItemInterface $item) use ($osPhoneVersionRepository, $id){
             $item->expiresAfter($this->getParameter("cache.expiration"));
 
-            return $phoneRepository->findOneBy(['id' => $id]);
+            return $osPhoneVersionRepository->findOneBy(['id' => $id]);
         });
 
-        if (empty($phone)) {
-            return new JsonResponse(['code' => 404, 'message' => 'Phone not found for id = '.$id], Response::HTTP_NOT_FOUND);
+        if (empty($osPhoneVersion)) {
+            return new JsonResponse(['code' => 404, 'message' => 'Os version not found for id = '.$id], Response::HTTP_NOT_FOUND);
         }
 
         $hateoas = HateoasBuilder::create()->build();
 
-        $data = $hateoas->serialize($phone, 'json');
+        $data = $hateoas->serialize($osPhoneVersion, 'json');
 
         $response = new Response($data);
         $response->headers->set('Content-Type', 'application/json');

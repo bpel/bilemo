@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Enterprise;
 use App\Entity\User;
 use App\Form\UserType;
+use App\Repository\UserRepository;
+use App\Service\Pagination;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -39,15 +41,36 @@ class UserController extends AbstractController
      *     )
      *   )
      * )
+     *
+     * @SWG\Parameter(
+     *     name="page",
+     *     in="query",
+     *     type="integer",
+     *     description="Number page"
+     * )
+     * @SWG\Parameter(
+     *     name="limit",
+     *     in="query",
+     *     type="integer",
+     *     description="Number of element per page"
+     * )
+     *
      * @SWG\Tag(name="User")
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getUsers(CacheInterface $cache)
+    public function getUsers(Request $request, UserRepository $userRepository, CacheInterface $cache, Pagination $pagination)
     {
-        $users = $cache->get('users-list', function (ItemInterface $item){
-            $item->expiresAfter(120);
-            $em = $this->getDoctrine()->getManager();
-            return $em->getRepository(User::class)->findAll();
+        $page = $request->query->get('page');
+        $limit = $request->query->get('limit');
+
+        if(!$pagination->isValidParameters($page, $limit))
+        {
+            return new JsonResponse(['code' => 400, 'message' => 'Bad parameters for pagination'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $users = $cache->get('users-list-p'.$page.'-l'.$limit, function (ItemInterface $item) use ($userRepository, $page, $limit){
+            $item->expiresAfter($this->getParameter("cache.expiration"));
+            return $userRepository->findAllUsers($page, $limit);
         });
 
         if (empty($users)) {
@@ -85,13 +108,12 @@ class UserController extends AbstractController
      * @SWG\Tag(name="User")
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getUserDetail($id, CacheInterface $cache)
+    public function getUserDetail(UserRepository $userRepository, $id, CacheInterface $cache)
     {
-        $user = $cache->get('user-detail-'.$id, function (ItemInterface $item) use ($id) {
-            $item->expiresAfter(120);
-            $em = $this->getDoctrine()->getManager();
+        $user = $cache->get('user-detail-'.$id, function (ItemInterface $item) use ($id, $userRepository) {
+            $item->expiresAfter($this->getParameter("cache.expiration"));
 
-            return $em->getRepository(User::class)->findUserById($id);
+            return $userRepository->findOneBy(['id' => $id]);
         });
 
         if (empty($user)) {
@@ -101,49 +123,6 @@ class UserController extends AbstractController
         $hateoas = HateoasBuilder::create()->build();
 
         $data = $hateoas->serialize($user, 'json');
-
-        $response = new Response($data);
-        $response->headers->set('Content-Type', 'application/json');
-
-        return $response;
-    }
-
-    /**
-     * @Route("/api/users/enterprise/{id}", methods={"GET"})
-     * @param $id
-     * @return Response
-     *
-     * @SWG\Get(
-     * summary="",
-     * description="blaldfdd",
-     * produces={"application/json"},
-     * @SWG\Response(
-     *     response=200,
-     *     description="Return list user per enterprise",
-     *     @SWG\Schema(
-     *         type="array",
-     *         @SWG\Items(ref=@Model(type=User::class, groups={"full"}))
-     *     )
-     *   )
-     * )
-     * @SWG\Tag(name="User")
-     * @throws \Psr\Cache\InvalidArgumentException
-     */
-    public function getUsersByEnterprise($id, CacheInterface $cache)
-    {
-        $users = $cache->get('user-detail-'.$id, function (ItemInterface $item) use ($id){
-            $item->expiresAfter(120);
-            $em = $this->getDoctrine()->getManager();
-            return $em->getRepository(User::class)->findUsersByEnterprise($id);
-        });
-
-        if (empty($users)) {
-            return new JsonResponse(['code' => 404, 'message' => 'Users not found for enterprise with id = '.$id], Response::HTTP_NOT_FOUND);
-        }
-
-        $hateoas = HateoasBuilder::create()->build();
-
-        $data = $hateoas->serialize($users, 'json');
 
         $response = new Response($data);
         $response->headers->set('Content-Type', 'application/json');
@@ -184,6 +163,7 @@ class UserController extends AbstractController
             $manager->flush();
             return new JsonResponse(['code' => 201, 'message' => 'User created'], Response::HTTP_OK);
         }
+
         return new JsonResponse(['code' => 400, 'message' => 'Fields are not valid.'], Response::HTTP_BAD_REQUEST);
     }
 
@@ -201,8 +181,9 @@ class UserController extends AbstractController
      *   )
      * )
      * @SWG\Tag(name="User")
+     * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function deleteUser($id)
+    public function deleteUser($id, CacheInterface $cache)
     {
         $em = $this->getDoctrine()->getManager();
         $user = $em->getRepository(User::class)->findOneBy(['id' => $id]);
@@ -214,15 +195,8 @@ class UserController extends AbstractController
         $em->remove($user);
         $em->flush();
 
-        return new JsonResponse(['code' => 204, 'message' => 'User deleted'], Response::HTTP_OK);
-    }
+        $cache->delete('user-detail-'.$id);
 
-    /**
-     * @Route("/api/login_check", methods={"POST"})
-     * @return Response
-     */
-    public function login()
-    {
-        return new JsonResponse(['user' => $this->getUser()]);
+        return new JsonResponse(['code' => 204, 'message' => 'User deleted'], Response::HTTP_NO_CONTENT);
     }
 }

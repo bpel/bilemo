@@ -7,7 +7,7 @@ use Hateoas\Configuration\Annotation as Hateoas;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\OsPhoneRepository")
- * @Hateoas\Relation("self", href = "expr('/api/osphones/' ~ object.getId())")
+ * @Hateoas\Relation("self", href = "expr('/api/os/' ~ object.getId())")
  */
 class OsPhone
 {

@@ -19,15 +19,12 @@ class PhoneRepository extends ServiceEntityRepository
         parent::__construct($registry, Phone::class);
     }
 
-    public function findPhoneById($idPhone)
+    public function findAllPhones($page, $limit)
     {
         return $this->createQueryBuilder('p')
-            ->select('p.namePhone, p.colour, p.goStorage, p.price, b.nameBrand')
-            ->leftJoin('p.brand','b')
-            ->leftJoin('p.osVersion','osv')
-            ->andWhere('p.id = :idphone')
-            ->setParameter('idphone', $idPhone)
             ->getQuery()
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
             ->getResult()
             ;
     }
