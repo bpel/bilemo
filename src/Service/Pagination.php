@@ -27,7 +27,7 @@ class Pagination {
     {
         if (is_numeric($page))
         {
-            $page = intval($page);
+            $page = (int)$page;
             if($page > 0) { return true; }
         }
         return false;
@@ -37,7 +37,7 @@ class Pagination {
     {
         if (is_numeric($limit))
         {
-            $limit = intval($limit);
+            $limit = (int)$limit;
             if($limit > 0) { return true; }
         }
         return false;
