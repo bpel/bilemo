@@ -25,13 +25,21 @@ class Pagination {
 
     public function isValidPage($page): bool
     {
-        if(is_numeric($page) && $page > 0) { return true; }
+        if (is_numeric($page))
+        {
+            $page = intval($page);
+            if($page > 0) { return true; }
+        }
         return false;
     }
 
     public function isValidLimit($limit): bool
     {
-        if(is_numeric($limit) && $limit > 0) { return true; }
+        if (is_numeric($limit))
+        {
+            $limit = intval($limit);
+            if($limit > 0) { return true; }
+        }
         return false;
     }
 }

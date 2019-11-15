@@ -5,6 +5,8 @@ namespace App\EventSubscriber;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ExceptionSubscriber implements EventSubscriberInterface
@@ -18,6 +20,20 @@ class ExceptionSubscriber implements EventSubscriberInterface
             $data = [
                 'code' => 500,
                 'message' => 'Internal Server Error'
+            ];
+        }
+
+        if($exception instanceof BadRequestHttpException ){
+            $data = [
+                'code' => '400',
+                'message' => 'Bad request'
+            ];
+        }
+
+        if($exception instanceof MethodNotAllowedHttpException  ){
+            $data = [
+                'code' => '405',
+                'message' => 'Method not allowed'
             ];
         }
 
