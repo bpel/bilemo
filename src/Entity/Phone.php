@@ -5,6 +5,8 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Hateoas\Configuration\Annotation as Hateoas;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Swagger\Annotations as SWG;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PhoneRepository")
@@ -21,23 +23,27 @@ class Phone
 
     /**
      * @ORM\Column(type="string", length=200, unique=true)
+     * @SWG\Property(type="string", maxLength=200)
      */
     private $namePhone;
 
     /**
      * @ORM\ManyToOne(targetEntity="Brand", cascade={"persist"})
      * @JoinColumn(name="brand", referencedColumnName="id")
+     * @SWG\Property(ref=@Model(type=Brand::class))
      */
     private $brand;
 
     /**
      * @ORM\Column(type="string", length=100)
+     * @SWG\Property(type="string", maxLength=255)
      */
     private $colour;
 
     /**
      * @ORM\ManyToOne(targetEntity="OsPhoneVersion", cascade={"persist"})
      * @JoinColumn(name="osversion", referencedColumnName="id")
+     * @SWG\Property(ref=@Model(type=OsPhoneVersion::class))
      */
     private $osVersion;
 
@@ -128,5 +134,5 @@ class Phone
         return $this;
     }
 
-    
+
 }

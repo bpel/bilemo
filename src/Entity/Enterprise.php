@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Hateoas\Configuration\Annotation as Hateoas;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Swagger\Annotations as SWG;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\EnterpriseRepository")
@@ -20,6 +22,7 @@ class Enterprise
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @SWG\Property(type="string", maxLength=255)
      */
     private $nameEnterprise;
 

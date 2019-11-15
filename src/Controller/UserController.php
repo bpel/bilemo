@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Enterprise;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
@@ -13,11 +12,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Symfony\Component\Validator\Validation;
 use Hateoas\HateoasBuilder;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -30,29 +27,51 @@ class UserController extends AbstractController
      *
      * @SWG\Get(
      * summary="Get user list",
-     * description="",
      * produces={"application/json"},
-     * @SWG\Response(
-     *     response=200,
-     *     description="Return user list",
-     *     @SWG\Schema(
-     *         type="array",
-     *         @SWG\Items(ref=@Model(type=User::class, groups={"full"}))
-     *     )
-     *   )
-     * )
+     *
+     * @SWG\Parameter(
+     *     name="Authorization",
+     *     in="header",
+     *     required=true,
+     *     type="string",
+     *     default="Bearer jwt",
+     *     description="Authorization token required to access resources"
+     * ),
      *
      * @SWG\Parameter(
      *     name="page",
      *     in="query",
      *     type="integer",
-     *     description="Number page"
-     * )
+     *     description="page number"
+     * ),
      * @SWG\Parameter(
      *     name="limit",
      *     in="query",
      *     type="integer",
-     *     description="Number of element per page"
+     *     description="number items per page"
+     * ),
+     *
+     * @SWG\Response(
+     *     response=200,
+     *     description="Return user list",
+     *     @SWG\Schema()
+     * ),
+     * @SWG\Response(
+     *     response=400,
+     *     description="Bad parameters for pagination",
+     * ),
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Token not found or expired",
+     * ),
+     * @SWG\Response(
+     *     response=404,
+     *     description="User not found",
+     * ),
+     * @SWG\Response(
+     *     response=500,
+     *     description="Server error",
+     * )
      * )
      *
      * @SWG\Tag(name="User")
@@ -94,17 +113,36 @@ class UserController extends AbstractController
      *
      * @SWG\Get(
      * summary="Get user detail",
-     * description="",
      * produces={"application/json"},
+     *
+     * @SWG\Parameter(
+     *     name="Authorization",
+     *     in="header",
+     *     required=true,
+     *     type="string",
+     *     default="Bearer jwt",
+     *     description="Authorization token required to access resources"
+     * ),
+     *
      * @SWG\Response(
      *     response=200,
      *     description="Return user detail",
-     *     @SWG\Schema(
-     *         type="array",
-     *         @SWG\Items(ref=@Model(type=User::class, groups={"full"}))
-     *     )
-     *   )
+     *     @SWG\Schema()
+     * ),
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Token not found or expired",
+     * ),
+     * @SWG\Response(
+     *     response=404,
+     *     description="User not found",
+     * ),
+     * @SWG\Response(
+     *     response=500,
+     *     description="Server error",
      * )
+     * )
+     *
      * @SWG\Tag(name="User")
      * @throws \Psr\Cache\InvalidArgumentException
      */
@@ -136,13 +174,44 @@ class UserController extends AbstractController
      *
      * @SWG\Post(
      * summary="Create new user",
-     * description="",
      * produces={"application/json"},
+     *
+     * @SWG\Parameter(
+     *     name="Authorization",
+     *     in="header",
+     *     required=true,
+     *     type="string",
+     *     default="Bearer jwt",
+     *     description="Authorization token required to access resources"
+     * ),
+     *
+     * @SWG\Parameter(
+     *     name="user",
+     *     in="body",
+     *     description="data to create new user",
+     *     required=true,
+     *     type="array",
+     *     @SWG\Schema()
+     * ),
+     *
      * @SWG\Response(
      *     response=200,
      *     description="User created",
-     *   )
+     * ),
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Token not found or expired",
+     * ),
+     * @SWG\Response(
+     *     response=400,
+     *     description="Fields are not valid.",
+     * ),
+     * @SWG\Response(
+     *     response=500,
+     *     description="Server error",
      * )
+     * )
+     *
      * @SWG\Tag(name="User")
      */
     public function addUser(Request $request, ObjectManager $manager, UserPasswordEncoderInterface $encoder)
@@ -173,13 +242,35 @@ class UserController extends AbstractController
      *
      * @SWG\Delete(
      * summary="Delete user",
-     * description="",
      * produces={"application/json"},
+     *
+     * @SWG\Parameter(
+     *     name="Authorization",
+     *     in="header",
+     *     required=true,
+     *     type="string",
+     *     default="Bearer jwt",
+     *     description="Authorization token required to access resources"
+     * ),
+     *
      * @SWG\Response(
      *     response=200,
      *     description="User deleted",
-     *   )
+     * ),
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Token not found or expired",
+     * ),
+     * @SWG\Response(
+     *     response=404,
+     *     description="User not found",
+     * ),
+     * @SWG\Response(
+     *     response=500,
+     *     description="Server error",
      * )
+     * )
+     *
      * @SWG\Tag(name="User")
      * @throws \Psr\Cache\InvalidArgumentException
      */

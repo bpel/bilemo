@@ -24,35 +24,51 @@ class OsPhoneVersionController extends AbstractController
      *
      * @SWG\Get(
      * summary="Get Os version list",
-     * description="",
      * produces={"application/json"},
-     * @SWG\Response(
-     *     response=200,
-     *     description="Return os version list",
-     *     @SWG\Schema(
-     *         type="array",
-     *         @SWG\Items(ref=@Model(type=OsPhoneVersion::class, groups={"full"}))
-     *     )
-     *   )
-     * )
      *
+     * @SWG\Parameter(
+     *     name="Authorization",
+     *     in="header",
+     *     required=true,
+     *     type="string",
+     *     default="Bearer jwt",
+     *     description="Authorization token required to access resources"
+     * ),
      * @SWG\Parameter(
      *     name="page",
      *     in="query",
      *     type="integer",
-     *     description="Number page"
-     * )
+     *     description="page number"
+     * ),
      * @SWG\Parameter(
      *     name="limit",
      *     in="query",
      *     type="integer",
-     *     description="Number of element per page"
-     * )
+     *     description="number items per page"
+     * ),
      *
+     * @SWG\Response(
+     *     response=200,
+     *     description="Return os version list",
+     *     @SWG\Schema(ref=@Model(type=OsPhoneVersion::class))
+     * ),
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Token not found or expired",
+     * ),
+     * @SWG\Response(
+     *     response=404,
+     *     description="Os version not found",
+     * ),
+     * @SWG\Response(
+     *     response=500,
+     *     description="Server error",
+     * )
+     * )
      * @SWG\Tag(name="Os version")
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getPhones(Request $request, OsPhoneVersionRepository $osPhoneVersionRepository, CacheInterface $cache, Pagination $pagination)
+    public function getOsPhonesVersions(Request $request, OsPhoneVersionRepository $osPhoneVersionRepository, CacheInterface $cache, Pagination $pagination)
     {
         $page = $request->query->get('page');
         $limit = $request->query->get('limit');
@@ -90,21 +106,39 @@ class OsPhoneVersionController extends AbstractController
      *
      * @SWG\Get(
      * summary="Get Os version detail",
-     * description="",
      * produces={"application/json"},
+     *
+     * @SWG\Parameter(
+     *     name="Authorization",
+     *     in="header",
+     *     required=true,
+     *     type="string",
+     *     default="Bearer jwt",
+     *     description="Authorization token required to access resources"
+     * ),
+     *
      * @SWG\Response(
      *     response=200,
      *     description="Return os version detail",
-     *     @SWG\Schema(
-     *         type="array",
-     *         @SWG\Items(ref=@Model(type=OsPhoneVersion::class, groups={"full"}))
-     *     )
-     *   )
+     *     @SWG\Schema(ref=@Model(type=OsPhoneVersion::class))
+     * ),
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Token not found or expired",
+     * ),
+     * @SWG\Response(
+     *     response=404,
+     *     description="Os version not found",
+     * ),
+     * @SWG\Response(
+     *     response=500,
+     *     description="Server error",
+     * )
      * )
      * @SWG\Tag(name="Os version")
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getPhone(OsPhoneVersionRepository $osPhoneVersionRepository, CacheInterface $cache, $id)
+    public function getOsPhoneVersion(OsPhoneVersionRepository $osPhoneVersionRepository, CacheInterface $cache, $id)
     {
         $osPhoneVersion = $cache->get('osphoneversion-detail-'.$id, function (ItemInterface $item) use ($osPhoneVersionRepository, $id){
             $item->expiresAfter($this->getParameter("cache.expiration"));
