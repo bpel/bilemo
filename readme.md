@@ -84,7 +84,7 @@ php bin/console make:migration
 php bin/console doctrine:migrations:migrate
 
 // 3) Load fixtures
-php bin/console doctrines:fixtures:load
+php bin/console doctrine:fixtures:load
 ```
 ### Deployment
 
