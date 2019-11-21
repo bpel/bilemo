@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Hateoas\Configuration\Annotation as Hateoas;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Swagger\Annotations as SWG;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\OsPhoneVersionRepository")
@@ -20,11 +22,13 @@ class OsPhoneVersion
 
     /**
      * @ORM\Column(type="string", length=100)
+     * @SWG\Property(type="string", maxLength=100)
      */
     private $version;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\OsPhone")
+     * @SWG\Property(ref=@Model(type=OsPhone::class))
      */
     private $os;
 

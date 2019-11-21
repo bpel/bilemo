@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Entity\Enterprise;
 use App\Repository\EnterpriseRepository;
 use App\Repository\UserRepository;
@@ -25,35 +26,52 @@ class EnterpriseController extends AbstractController
      *
      * @SWG\Get(
      * summary="Get enterprise list",
-     * description="",
      * produces={"application/json"},
-     * @SWG\Response(
-     *     response=200,
-     *     description="Return enterprise list",
-     *     @SWG\Schema(
-     *         type="array",
-     *         @SWG\Items(ref=@Model(type=Enterprise::class, groups={"full"}))
-     *     )
-     *   )
-     * )
      *
+     * @SWG\Parameter(
+     *     name="Authorization",
+     *     in="header",
+     *     required=true,
+     *     type="string",
+     *     default="Bearer jwt",
+     *     description="Authorization token required to access resources"
+     * ),
      * @SWG\Parameter(
      *     name="page",
      *     in="query",
      *     type="integer",
-     *     description="Number page"
-     * )
+     *     description="page number"
+     * ),
      * @SWG\Parameter(
      *     name="limit",
      *     in="query",
      *     type="integer",
-     *     description="Number of element per page"
+     *     description="number items per page"
+     * ),
+     *
+     * @SWG\Response(
+     *     response=200,
+     *     description="Return enterprise list",
+     *     @SWG\Schema(ref=@Model(type=Enterprise::class))
+     * ),
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Token not found or expired",
+     * ),
+     * @SWG\Response(
+     *     response=400,
+     *     description="Bad parameters for pagination",
+     * ),
+     * @SWG\Response(
+     *     response=500,
+     *     description="Server error",
+     * )
      * )
      *
      * @SWG\Tag(name="Enterprise")
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getBrands(Request $request, EnterpriseRepository $enterpriseRepository, CacheInterface $cache, Pagination $pagination)
+    public function getEnterprises(Request $request, EnterpriseRepository $enterpriseRepository, CacheInterface $cache, Pagination $pagination)
     {
         $page = $request->query->get('page');
         $limit = $request->query->get('limit');
@@ -90,21 +108,40 @@ class EnterpriseController extends AbstractController
      *
      * @SWG\Get(
      * summary="Get brand detail",
-     * description="",
      * produces={"application/json"},
+     *
+     * @SWG\Parameter(
+     *     name="Authorization",
+     *     in="header",
+     *     required=true,
+     *     type="string",
+     *     default="Bearer jwt",
+     *     description="Authorization token required to access resources"
+     * ),
+     *
      * @SWG\Response(
      *     response=200,
      *     description="Return enterprise detail",
-     *     @SWG\Schema(
-     *         type="array",
-     *         @SWG\Items(ref=@Model(type=Enterprise::class, groups={"full"}))
-     *     )
-     *   )
+     *     @SWG\Schema(ref=@Model(type=Enterprise::class))
+     * ),
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Token not found or expired",
+     * ),
+     * @SWG\Response(
+     *     response=404,
+     *     description="Enterprise not found",
+     * ),
+     * @SWG\Response(
+     *     response=500,
+     *     description="Server error",
+     * )
+     *
      * )
      * @SWG\Tag(name="Enterprise")
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function getBrand(EnterpriseRepository $enterpriseRepository, CacheInterface $cache, $id)
+    public function getEnterprise(EnterpriseRepository $enterpriseRepository, CacheInterface $cache, $id)
     {
         $enterprise = $cache->get('enterprise-detail-'.$id, function (ItemInterface $item) use ($enterpriseRepository, $id){
             $item->expiresAfter($this->getParameter("cache.expiration"));
@@ -132,17 +169,35 @@ class EnterpriseController extends AbstractController
      * @return Response
      *
      * @SWG\Get(
-     * summary="",
-     * description="",
+     * summary="Get list users by enterprise id",
      * produces={"application/json"},
+     *
+     * @SWG\Parameter(
+     *     name="Authorization",
+     *     in="header",
+     *     required=true,
+     *     type="string",
+     *     default="Bearer jwt",
+     *     description="Authorization token required to access resources"
+     * ),
+     *
      * @SWG\Response(
      *     response=200,
-     *     description="Return list user per enterprise",
-     *     @SWG\Schema(
-     *         type="array",
-     *         @SWG\Items(ref=@Model(type=Enterprise::class, groups={"full"}))
-     *     )
-     *   )
+     *     description="Return list users for id enterprise given",
+     *     @SWG\Schema()
+     * ),
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Token not found or expired",
+     * ),
+     * @SWG\Response(
+     *     response=404,
+     *     description="Enterprise not found",
+     * ),
+     * @SWG\Response(
+     *     response=500,
+     *     description="Server error",
+     * )
      * )
      * @SWG\Tag(name="Enterprise")
      * @throws \Psr\Cache\InvalidArgumentException

@@ -24,29 +24,46 @@ class BrandController extends AbstractController
      *
      * @SWG\Get(
      * summary="Get brand list",
-     * description="",
      * produces={"application/json"},
-     * @SWG\Response(
-     *     response=200,
-     *     description="Return brand list",
-     *     @SWG\Schema(
-     *         type="array",
-     *         @SWG\Items(ref=@Model(type=Brand::class, groups={"full"}))
-     *     )
-     *   )
-     * )
      *
+     * @SWG\Parameter(
+     *     name="Authorization",
+     *     in="header",
+     *     required=true,
+     *     type="string",
+     *     default="Bearer jwt",
+     *     description="Authorization token required to access resources"
+     * ),
      * @SWG\Parameter(
      *     name="page",
      *     in="query",
      *     type="integer",
-     *     description="Number page"
-     * )
+     *     description="page number"
+     * ),
      * @SWG\Parameter(
      *     name="limit",
      *     in="query",
      *     type="integer",
-     *     description="Number of element per page"
+     *     description="number items per page"
+     * ),
+     *
+     * @SWG\Response(
+     *     response=200,
+     *     description="Return brand list",
+     *     @SWG\Schema(ref=@Model(type=Brand::class))
+     * ),
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Token not found or expired",
+     * ),
+     * @SWG\Response(
+     *     response=404,
+     *     description="Brand not found",
+     * ),
+     * @SWG\Response(
+     *     response=500,
+     *     description="Server error",
+     * ),
      * )
      *
      * @SWG\Tag(name="Brand")
@@ -89,16 +106,34 @@ class BrandController extends AbstractController
      *
      * @SWG\Get(
      * summary="Get brand detail",
-     * description="",
      * produces={"application/json"},
+     *
+     * @SWG\Parameter(
+     *     name="Authorization",
+     *     in="header",
+     *     required=true,
+     *     type="string",
+     *     default="Bearer jwt",
+     *     description="Authorization token required to access resources"
+     * ),
+     *
      * @SWG\Response(
      *     response=200,
      *     description="Return brand detail",
-     *     @SWG\Schema(
-     *         type="array",
-     *         @SWG\Items(ref=@Model(type=Brand::class, groups={"full"}))
-     *     )
-     *   )
+     *     @SWG\Schema(ref=@Model(type=Brand::class))
+     * ),
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Token not found or expired",
+     * ),
+     * @SWG\Response(
+     *     response=404,
+     *     description="Brand not found",
+     * ),
+     * @SWG\Response(
+     *     response=500,
+     *     description="Server error",
+     * )
      * )
      * @SWG\Tag(name="Brand")
      * @throws \Psr\Cache\InvalidArgumentException

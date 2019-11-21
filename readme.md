@@ -84,7 +84,7 @@ php bin/console make:migration
 php bin/console doctrine:migrations:migrate
 
 // 3) Load fixtures
-php bin/console doctrines:fixtures:load
+php bin/console doctrine:fixtures:load
 ```
 ### Deployment
 
@@ -104,4 +104,4 @@ curl -X POST -H "Content-Type: application/json" http://127.0.0.1:8000/api/login
 
 ## Documentation
 
-- Documentation is available on `127.0.0.1:8000/api/doc`
+- Documentation is available on (run server before)`127.0.0.1:8000/api/doc`

@@ -19,19 +19,27 @@ class Pagination {
 
     public function isDefined($page, $limit): bool
     {
-        if($page ==! null || $limit ==! null) { return true; }
+        if(isset($page) || isset($limit)) { return true; }
         return false;
     }
 
     public function isValidPage($page): bool
     {
-        if(is_numeric($page) && $page > 0) { return true; }
+        if (is_numeric($page))
+        {
+            $page = (int)$page;
+            if($page > 0) { return true; }
+        }
         return false;
     }
 
     public function isValidLimit($limit): bool
     {
-        if(is_numeric($limit) && $limit > 0) { return true; }
+        if (is_numeric($limit))
+        {
+            $limit = (int)$limit;
+            if($limit > 0) { return true; }
+        }
         return false;
     }
 }
